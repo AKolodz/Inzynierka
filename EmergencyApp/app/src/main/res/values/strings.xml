@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">EmergencyApp</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- MainActivity -->
+    <string name="title_login">Login Screen</string>
+    <string name="text_view_login">Login:</string>
+    <string name="edit_text_login">Enter your login</string>
+    <string name="text_view_password">Password:</string>
+    <string name="edit_text_password">Enter your password</string>
+    <string name="button_login">Log In!</string>
+
+    <!-- HomeScreen -->
+    <string name="button_emergency">EMERGENCY</string>
+    <string name="button_medicaments">MEDICAMENTS</string>
+    <string name="text_view_choice">Choose a section:</string>
+
+    <!-- Emergency Detail Activity-->
+    <string name="title_emergency_view">Current Emergency Object</string>
+    <string name="button_change">Change pattern</string>
+
+    <!-- Emergency List Activity-->
+    <string name="title_emergency_list">Available Patterns</string>
+    <string name="button_add_pattern">Add new pattern</string>
+
+</resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="12dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
+    android:background="@color/Custom1">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/scroll_view_emergency"
+        android:padding="2dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/Custom2">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_view_emergency_title"
+            android:text="Title"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </ScrollView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Emergency Number"
+        android:layout_below="@+id/scroll_view_emergency"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:paddingStart="10dp"
+        android:paddingBottom="2dp"
+        android:layout_marginBottom="5dp"
+        android:paddingEnd="15dp"
+        android:id="@+id/text_view_emergency_number"
+        android:background="@color/Custom2" />
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/text_view_emergency_number"
+        android:id="@+id/scroll_view_emergency2"
+        android:layout_alignParentEnd="true"
+        android:padding="10dp"
+        android:background="@color/Custom2"
+        android:layout_above="@+id/button_change">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_view_emergency_message"
+            android:text="Message"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    </ScrollView>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/button_change"
+        android:text="@string/button_change"/>
+    </RelativeLayout>
