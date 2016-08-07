@@ -12,6 +12,10 @@ import butterknife.InjectView;
 public class EmergencyListActivity extends AppCompatActivity {
 
     public final static String FRAGMENT_TO_LOAD_EXTRA="kolodziejczyk.olek.inzynierka.emergencyapp.Fragment_To_Load";
+    public final static String EMERGENCY_TITLE_EXTRA="kolodziejczyk.olek.inzynierka.emergencyapp.Title";
+    public final static String EMERGENCY_NUMBER_EXTRA="kolodziejczyk.olek.inzynierka.emergencyapp.Number";
+    public final static String EMERGENCY_MESSAGE_EXTRA="kolodziejczyk.olek.inzynierka.emergencyapp.Message";
+
 
     @InjectView(R.id.button_add_pattern)
     Button bAddPattern;

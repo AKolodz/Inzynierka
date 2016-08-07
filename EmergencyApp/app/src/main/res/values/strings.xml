@@ -17,10 +17,18 @@
 
     <!-- Emergency Detail Activity-->
     <string name="title_emergency_view">Current Emergency Object</string>
+    <string name="title_emergency_edit">Edit Emergency Object</string>
     <string name="button_change">Change pattern</string>
+    <string name="confirmation_message">Do you want to change pattern to selected one?</string>
+    <string name="confirmation_title">Are you sure?</string>
 
     <!-- Emergency List Activity-->
     <string name="title_emergency_list">Available Patterns</string>
     <string name="button_add_pattern">Add new pattern</string>
+    <string name="item_menu_edit">Edit</string>
+    <string name="item_menu_delete">Delete</string>
 
+    <!-- Emergency Edit Fragment -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="button_save">Save</string>
 </resources>

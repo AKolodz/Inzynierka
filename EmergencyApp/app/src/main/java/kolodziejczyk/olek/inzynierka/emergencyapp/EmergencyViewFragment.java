@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -42,12 +43,13 @@ public class EmergencyViewFragment extends Fragment {
         ButterKnife.inject(this,fragmentLayout);
 
         Intent intent=getActivity().getIntent();
-        if(intent.getExtras()!=null){
-            //tvTitle.setText(intent.getExtras().getString("CURRENT_TITLE_EXTRA",""));
-            //tvNumber.setText(intent.getExtras().getString("CURRENT_NUMBER_EXTRA",""));
-            //tvMessage.setText(intent.getExtras().getString("CURRENT_MESSAGE_EXTRA"));
-        }
+        tvTitle.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_TITLE_EXTRA));
+        tvNumber.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_NUMBER_EXTRA));
+        tvMessage.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA));
 
+        if (tvNumber.getText().equals("")){
+            Toast.makeText(getActivity(),"Please, select emergency pattern that contains emergency number",Toast.LENGTH_LONG).show();
+        }
         bChangePattern.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

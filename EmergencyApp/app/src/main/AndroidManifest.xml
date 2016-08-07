@@ -20,10 +20,8 @@
         </activity>
         <activity android:name=".HomeScreen" />
         <activity
-            android:name=".EmergencyDetailActivity"
-            android:parentActivityName=".HomeScreen" />
-        <activity android:name=".EmergencyListActivity"
-            android:parentActivityName=".EmergencyDetailActivity"></activity>
+            android:name=".EmergencyDetailActivity" />
+        <activity android:name=".EmergencyListActivity"></activity>
     </application>
 
 </manifest>

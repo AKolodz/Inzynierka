@@ -28,11 +28,14 @@ public class EmergencyDetailActivity extends AppCompatActivity {
             case VIEW:
                 setTitle(R.string.title_emergency_view);
                 EmergencyViewFragment emergencyViewFragment = new EmergencyViewFragment();
-                fragmentTransaction.add(R.id.emergency_object_container,emergencyViewFragment,"EMERGENCY_OBJECT_VIEW");
+                fragmentTransaction.add(R.id.emergency_object_container,emergencyViewFragment);
                 break;
             case ADD:
                 break;
             case EDIT:
+                setTitle(R.string.title_emergency_edit);
+                EmergencyEditFragment emergencyEditFragment=new EmergencyEditFragment();
+                fragmentTransaction.add(R.id.emergency_object_container,emergencyEditFragment);
                 break;
         }
 
