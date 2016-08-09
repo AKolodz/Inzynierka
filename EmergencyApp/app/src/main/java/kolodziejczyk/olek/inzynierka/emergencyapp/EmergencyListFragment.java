@@ -24,14 +24,19 @@ public class EmergencyListFragment extends ListFragment {
 
     private ArrayList<EmergencyObject> exampleList;
     private EmergencyObjectAdapter emergencyObjectAdapter;
-    private EmergencyObject exampleObject;
     private AlertDialog confirmDialogObject;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-        exampleList=new ArrayList<EmergencyObject>();
-        exampleList=fillWithExampleObjects(exampleList);
+
+        EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
+        dbAdapter.open();
+        exampleList=dbAdapter.getAllEmergencyObjects();
+        dbAdapter.close();
+
+        //exampleList=fillWithExampleObjects(exampleList); In fact i think we should use onCreate method in DatabaseAdapter class (DATABASE_CREATE should add default object)
+
         emergencyObjectAdapter=new EmergencyObjectAdapter(getContext(),exampleList);
         setListAdapter(emergencyObjectAdapter);
 
@@ -40,12 +45,8 @@ public class EmergencyListFragment extends ListFragment {
     }
 
     private ArrayList<EmergencyObject> fillWithExampleObjects(ArrayList<EmergencyObject> exampleList) {
-        exampleObject=new EmergencyObject("Son","515159540","I need your help, I don't know where am I");
-        exampleList.add(exampleObject);
-        exampleObject=new EmergencyObject("Wife","604005009","I've been taken to the hospital");
-        exampleList.add(exampleObject);
-        exampleObject=new EmergencyObject("Grandson","(22)8433486","Call me as soon as it is possible, I don't feel really good");
-        exampleList.add(exampleObject);
+        exampleList.add(new EmergencyObject
+                ("Default Pattern: Emergency","999","Default message: I need help"));
         return exampleList;
     }
 
@@ -79,10 +80,13 @@ public class EmergencyListFragment extends ListFragment {
     private void selectChosenPattern(int position, MainActivity.FragmentToLaunch fragmentToLaunch) {
         //catching clicked item from the list and putting to temporary object
         EmergencyObject emergencyObject= (EmergencyObject) getListAdapter().getItem(position);
+
         Intent intent=new Intent(getActivity(),EmergencyDetailActivity.class);
+
         intent.putExtra(EmergencyListActivity.EMERGENCY_TITLE_EXTRA,emergencyObject.getTitle());
         intent.putExtra(EmergencyListActivity.EMERGENCY_NUMBER_EXTRA,emergencyObject.getPhoneNumber());
         intent.putExtra(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA,emergencyObject.getMessage());
+        intent.putExtra(EmergencyListActivity.EMERGENCY_ID_EXTRA,emergencyObject.getObjectId());
 
         switch(fragmentToLaunch){
             case VIEW:

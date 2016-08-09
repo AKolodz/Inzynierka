@@ -1,10 +1,15 @@
 package kolodziejczyk.olek.inzynierka.emergencyapp;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sasza_000 on 2016-08-09.
@@ -20,10 +25,11 @@ public class EmergencyDatabaseAdapter {
     public static final String COLUMN_NUMBER="number";
     public static final String COLUMN_MESSAGE="message";
 
-    private String[] allColumn={COLUMN_ID,COLUMN_TITLE,COLUMN_NUMBER,COLUMN_MESSAGE};
+    private String[] allColumns={COLUMN_ID,COLUMN_TITLE,COLUMN_NUMBER,COLUMN_MESSAGE};
 
     public static final String DATABASE_CREATE=
-            "create table "+EMERGENCY_TABLE+" ( "+COLUMN_ID+" integer primary key autoincrement, "+
+            "create table "+EMERGENCY_TABLE+" ( "+
+                    COLUMN_ID+" integer primary key autoincrement, "+
                     COLUMN_TITLE + " text not null, "+
                     COLUMN_NUMBER+" text not null, "+
                     COLUMN_MESSAGE+" text not null);";
@@ -44,6 +50,51 @@ public class EmergencyDatabaseAdapter {
 
     public void close(){
         emergencyDbHelper.close();
+    }
+
+    public EmergencyObject createEmergencyObject(String title, String number, String message){
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TITLE,title);
+        values.put(COLUMN_NUMBER,number);
+        values.put(COLUMN_MESSAGE,message);
+
+        long insertId=sqlDB.insert(EMERGENCY_TABLE,null,values);
+        Cursor cursor=sqlDB.query(EMERGENCY_TABLE,allColumns,COLUMN_ID+" = "+insertId,null,null,null,null);
+        cursor.moveToFirst();
+        EmergencyObject newEmergencyObject=cursorToEmergencyObject(cursor);
+        cursor.close();
+        return newEmergencyObject;
+    }
+
+    public long updateEmergencyObject(long idToUpdate, String newTitle, String newNumber, String newMessage){
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TITLE,newTitle);
+        values.put(COLUMN_NUMBER,newNumber);
+        values.put(COLUMN_MESSAGE,newMessage);
+
+        return sqlDB.update(EMERGENCY_TABLE,values, COLUMN_ID+" = "+ idToUpdate,null);
+
+    }
+
+    public void deleteEmergencyObject(){
+
+    }
+
+    public ArrayList<EmergencyObject> getAllEmergencyObjects(){
+        ArrayList<EmergencyObject> emergencyObjectArrayList=new ArrayList<EmergencyObject>();
+        Cursor cursor=sqlDB.query(EMERGENCY_TABLE,allColumns,null,null,null,null,null);
+
+        for(cursor.moveToLast(); !cursor.isBeforeFirst(); cursor.moveToPrevious()){
+            EmergencyObject emergencyObject=cursorToEmergencyObject(cursor);
+            emergencyObjectArrayList.add(emergencyObject);
+        }
+        cursor.close();
+        return emergencyObjectArrayList;
+    }
+
+    private EmergencyObject cursorToEmergencyObject(Cursor cursor) {
+        EmergencyObject newObject=new EmergencyObject(cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getLong(0));
+        return newObject;
     }
 
 

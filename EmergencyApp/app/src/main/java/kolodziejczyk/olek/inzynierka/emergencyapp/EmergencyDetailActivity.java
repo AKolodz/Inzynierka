@@ -11,6 +11,8 @@ import android.os.Bundle;
 public class EmergencyDetailActivity extends AppCompatActivity {
 
 
+    public static final String NEW_OBJECT_EXTRA = "New Emergency Object";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +35,11 @@ public class EmergencyDetailActivity extends AppCompatActivity {
             case ADD:
                 setTitle(R.string.title_emergency_add);
                 EmergencyEditFragment emergencyAddFragment= new EmergencyEditFragment();
+
+                Bundle bundle=new Bundle();
+                bundle.putBoolean(NEW_OBJECT_EXTRA,true);
+                emergencyAddFragment.setArguments(bundle);
+
                 fragmentTransaction.add(R.id.emergency_object_container,emergencyAddFragment);
                 break;
             case EDIT:
