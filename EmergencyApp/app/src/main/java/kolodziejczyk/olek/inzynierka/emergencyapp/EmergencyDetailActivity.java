@@ -31,6 +31,9 @@ public class EmergencyDetailActivity extends AppCompatActivity {
                 fragmentTransaction.add(R.id.emergency_object_container,emergencyViewFragment);
                 break;
             case ADD:
+                setTitle(R.string.title_emergency_add);
+                EmergencyEditFragment emergencyAddFragment= new EmergencyEditFragment();
+                fragmentTransaction.add(R.id.emergency_object_container,emergencyAddFragment);
                 break;
             case EDIT:
                 setTitle(R.string.title_emergency_edit);

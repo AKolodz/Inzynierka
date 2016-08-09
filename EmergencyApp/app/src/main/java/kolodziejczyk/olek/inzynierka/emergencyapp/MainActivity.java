@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent= new Intent(getApplicationContext(),HomeScreen.class);
                     startActivity(intent);
                     finish();
-                    Toast.makeText(getApplicationContext(),"Hello "+correctLogin,Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Hello "+correctLogin,Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(getApplicationContext(),"Wrong data, please try again",Toast.LENGTH_LONG).show();
                 }

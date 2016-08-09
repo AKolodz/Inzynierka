@@ -18,6 +18,7 @@
     <!-- Emergency Detail Activity-->
     <string name="title_emergency_view">Current Emergency Object</string>
     <string name="title_emergency_edit">Edit Emergency Object</string>
+    <string name="title_emergency_add">Adding Emergency Object</string>
     <string name="button_change">Change pattern</string>
     <string name="confirmation_message">Do you want to change pattern to selected one?</string>
     <string name="confirmation_title">Are you sure?</string>

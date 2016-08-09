@@ -53,7 +53,6 @@ public class EmergencyListFragment extends ListFragment {
     public void onListItemClick(ListView list, View view, int position, long id){
         super.onListItemClick(list,view,position,id);
         createConfirmationWindow(position); //creates DialogBox
-
     }
 
     private void createConfirmationWindow(final int position){
