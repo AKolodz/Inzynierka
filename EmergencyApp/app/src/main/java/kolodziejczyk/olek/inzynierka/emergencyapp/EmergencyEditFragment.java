@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,10 +34,11 @@ public class EmergencyEditFragment extends Fragment {
 
     private boolean addEmergencyObject=false;
     private long emergencyObjectId=0;
+    private AlertDialog confirmDialogObject;
+
     public EmergencyEditFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,23 +61,42 @@ public class EmergencyEditFragment extends Fragment {
         bSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
-                dbAdapter.open();
-                if(addEmergencyObject){
-                    //if we're creating new object in our database
-                    dbAdapter.createEmergencyObject(etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+"");
-                    Toast.makeText(getContext(),"added!",Toast.LENGTH_SHORT).show();
-                }else{
-                    //in other case update an old object in database
-                    dbAdapter.updateEmergencyObject(emergencyObjectId,etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+"");
-                }
-                dbAdapter.close();
-                Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyListActivity.class);
-                startActivity(intent);
+                createConfirmationWindow();
             }
         });
         return fragmentLayout;
     }
 
+    private void createConfirmationWindow(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.confirmation_title1);
+        builder.setMessage(R.string.confirmation_message1);
 
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                EmergencyDatabaseAdapter dbAdapter= new EmergencyDatabaseAdapter(getActivity().getBaseContext());
+                dbAdapter.open();
+                if(addEmergencyObject){
+                    dbAdapter.createEmergencyObject(etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+"");
+                }else{
+                    dbAdapter.updateEmergencyObject(emergencyObjectId,etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+"");
+                }
+                dbAdapter.close();
+                Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyListActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //do nothing here
+            }
+        });
+
+        confirmDialogObject=builder.create();
+        confirmDialogObject.show();
+    }
 }

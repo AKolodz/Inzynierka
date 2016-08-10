@@ -76,13 +76,18 @@ public class EmergencyDatabaseAdapter {
 
     }
 
-    public void deleteEmergencyObject(){
-
+    public void deleteEmergencyObject(long idToDelete){
+        sqlDB.delete(EMERGENCY_TABLE,COLUMN_ID+" = "+idToDelete,null);
     }
 
     public ArrayList<EmergencyObject> getAllEmergencyObjects(){
         ArrayList<EmergencyObject> emergencyObjectArrayList=new ArrayList<EmergencyObject>();
         Cursor cursor=sqlDB.query(EMERGENCY_TABLE,allColumns,null,null,null,null,null);
+
+        //if database is empty create default object:
+        if(cursor.getCount()==0){
+            emergencyObjectArrayList.add(createEmergencyObject("Default Emergency Pattern","112","(Message generated automatically):\nI need help."));
+        }
 
         for(cursor.moveToLast(); !cursor.isBeforeFirst(); cursor.moveToPrevious()){
             EmergencyObject emergencyObject=cursorToEmergencyObject(cursor);

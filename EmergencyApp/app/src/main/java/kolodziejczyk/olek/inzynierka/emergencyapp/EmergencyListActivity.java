@@ -33,6 +33,7 @@ public class EmergencyListActivity extends AppCompatActivity {
                 Intent intent=new Intent(getApplicationContext(),EmergencyDetailActivity.class);
                 intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.ADD);
                 startActivity(intent);
+                finish();
             }
         });
     }

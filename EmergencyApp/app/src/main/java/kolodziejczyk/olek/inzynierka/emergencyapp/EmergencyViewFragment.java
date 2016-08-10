@@ -31,6 +31,8 @@ public class EmergencyViewFragment extends Fragment {
     @InjectView(R.id.button_change)
     Button bChangePattern;
 
+    private boolean firstRun=false;
+
     public EmergencyViewFragment() {
         // Required empty public constructor
     }
@@ -46,6 +48,14 @@ public class EmergencyViewFragment extends Fragment {
         tvTitle.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_TITLE_EXTRA));
         tvNumber.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_NUMBER_EXTRA));
         tvMessage.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA));
+        firstRun=intent.getExtras().getBoolean(HomeScreen.FIRST_RUN_EXTRA,false);
+
+        //CHECKS IF IT IS FIRST RUN - IF IT'S SO THEN WE SHOULD LOAD THE NEWEST OBJECT FROM DATABASE
+        if(firstRun){
+            Toast.makeText(getActivity().getApplicationContext(),"FIRST!",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getActivity().getApplicationContext(),"NOT FIRST- FROM LIST!",Toast.LENGTH_SHORT).show();
+        }
 
         if (tvNumber.getText().equals("")){
             Toast.makeText(getActivity(),"Please, select emergency pattern that contains emergency number",Toast.LENGTH_LONG).show();

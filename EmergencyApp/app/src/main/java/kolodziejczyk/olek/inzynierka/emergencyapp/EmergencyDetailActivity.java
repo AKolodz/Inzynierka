@@ -10,7 +10,6 @@ import android.os.Bundle;
 
 public class EmergencyDetailActivity extends AppCompatActivity {
 
-
     public static final String NEW_OBJECT_EXTRA = "New Emergency Object";
 
     @Override
@@ -18,7 +17,6 @@ public class EmergencyDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_detail);
         createAndAddFragment();
-
     }
 
     private void createAndAddFragment(){
@@ -50,8 +48,5 @@ public class EmergencyDetailActivity extends AppCompatActivity {
         }
 
         fragmentTransaction.commit();
-
-
-
     }
 }

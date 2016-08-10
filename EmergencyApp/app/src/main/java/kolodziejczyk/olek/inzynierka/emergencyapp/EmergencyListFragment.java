@@ -35,19 +35,10 @@ public class EmergencyListFragment extends ListFragment {
         exampleList=dbAdapter.getAllEmergencyObjects();
         dbAdapter.close();
 
-        //exampleList=fillWithExampleObjects(exampleList); In fact i think we should use onCreate method in DatabaseAdapter class (DATABASE_CREATE should add default object)
-
         emergencyObjectAdapter=new EmergencyObjectAdapter(getContext(),exampleList);
         setListAdapter(emergencyObjectAdapter);
 
         registerForContextMenu(getListView()); //used for longClickMenu
-
-    }
-
-    private ArrayList<EmergencyObject> fillWithExampleObjects(ArrayList<EmergencyObject> exampleList) {
-        exampleList.add(new EmergencyObject
-                ("Default Pattern: Emergency","999","Default message: I need help"));
-        return exampleList;
     }
 
     @Override
@@ -82,11 +73,11 @@ public class EmergencyListFragment extends ListFragment {
         EmergencyObject emergencyObject= (EmergencyObject) getListAdapter().getItem(position);
 
         Intent intent=new Intent(getActivity(),EmergencyDetailActivity.class);
-
         intent.putExtra(EmergencyListActivity.EMERGENCY_TITLE_EXTRA,emergencyObject.getTitle());
         intent.putExtra(EmergencyListActivity.EMERGENCY_NUMBER_EXTRA,emergencyObject.getPhoneNumber());
         intent.putExtra(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA,emergencyObject.getMessage());
         intent.putExtra(EmergencyListActivity.EMERGENCY_ID_EXTRA,emergencyObject.getObjectId());
+        intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,false);
 
         switch(fragmentToLaunch){
             case VIEW:
@@ -97,6 +88,7 @@ public class EmergencyListFragment extends ListFragment {
                 break;
         }
         startActivity(intent);
+        getActivity().finish();
     }
 
     @Override
@@ -111,12 +103,25 @@ public class EmergencyListFragment extends ListFragment {
         AdapterView.AdapterContextMenuInfo info= (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int itemPosition=info.position;
 
+        //to get clicked object's ID:
+        EmergencyObject emergencyObject= (EmergencyObject) getListAdapter().getItem(itemPosition);
+
         switch(item.getItemId()){
             case R.id.edit:
                 selectChosenPattern(itemPosition, MainActivity.FragmentToLaunch.EDIT);
                 break;
+
             case R.id.delete:
                 Toast.makeText(getContext(),"Delete", Toast.LENGTH_LONG).show();
+                EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
+                dbAdapter.open();
+                dbAdapter.deleteEmergencyObject(emergencyObject.getObjectId());
+
+                exampleList.clear();
+                exampleList.addAll(dbAdapter.getAllEmergencyObjects());
+                emergencyObjectAdapter.notifyDataSetChanged();
+
+                dbAdapter.close();
                 break;
         }
         return super.onContextItemSelected(item);

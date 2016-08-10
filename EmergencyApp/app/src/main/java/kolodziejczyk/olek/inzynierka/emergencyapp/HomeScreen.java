@@ -11,6 +11,8 @@ import butterknife.InjectView;
 
 public class HomeScreen extends AppCompatActivity {
 
+    public static final String FIRST_RUN_EXTRA = "If it's first run";
+
     @InjectView(R.id.button_emergency)
     Button bEmergency;
     @InjectView(R.id.button_medicaments)
@@ -28,6 +30,7 @@ public class HomeScreen extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(getApplicationContext(),EmergencyDetailActivity.class);
                 intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA,MainActivity.FragmentToLaunch.VIEW);
+                intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,true);
                 startActivity(intent);
             }
         });
