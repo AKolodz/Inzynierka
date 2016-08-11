@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -38,6 +39,7 @@ public class HomeScreen extends AppCompatActivity {
         bMedicaments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"Soon", Toast.LENGTH_SHORT).show();
                 //Intent intent= new Intent(getApplicationContext(),MedicamentsList.class);
                 //startActivity(intent);
             }

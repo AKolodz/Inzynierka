@@ -80,6 +80,15 @@ public class EmergencyDatabaseAdapter {
         sqlDB.delete(EMERGENCY_TABLE,COLUMN_ID+" = "+idToDelete,null);
     }
 
+    public EmergencyObject getLastEmergencyObject(){
+        EmergencyObject emergencyObject;
+        Cursor cursor = sqlDB.query(EMERGENCY_TABLE, allColumns, null, null, null, null, null, null);
+        cursor.moveToLast();
+        emergencyObject=cursorToEmergencyObject(cursor);
+        cursor.close();
+        return emergencyObject;
+    }
+
     public ArrayList<EmergencyObject> getAllEmergencyObjects(){
         ArrayList<EmergencyObject> emergencyObjectArrayList=new ArrayList<EmergencyObject>();
         Cursor cursor=sqlDB.query(EMERGENCY_TABLE,allColumns,null,null,null,null,null);

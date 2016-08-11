@@ -50,11 +50,19 @@ public class EmergencyViewFragment extends Fragment {
         tvMessage.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA));
         firstRun=intent.getExtras().getBoolean(HomeScreen.FIRST_RUN_EXTRA,false);
 
-        //CHECKS IF IT IS FIRST RUN - IF IT'S SO THEN WE SHOULD LOAD THE NEWEST OBJECT FROM DATABASE
+        //CHECKS IF IT IS FIRST RUN - IF IT'S SO THEN WE SHOULD LOAD LAST OBJECT FROM DATABASE
         if(firstRun){
-            Toast.makeText(getActivity().getApplicationContext(),"FIRST!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(),"FIRST RUN!",Toast.LENGTH_SHORT).show();
+            EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
+            dbAdapter.open();
+            EmergencyObject emergencyObject=dbAdapter.getLastEmergencyObject();
+            dbAdapter.close();
+
+            tvTitle.setText(emergencyObject.getTitle());
+            tvNumber.setText(emergencyObject.getPhoneNumber());
+            tvMessage.setText(emergencyObject.getMessage());
         }else{
-            Toast.makeText(getActivity().getApplicationContext(),"NOT FIRST- FROM LIST!",Toast.LENGTH_SHORT).show();
+            //do nothing
         }
 
         if (tvNumber.getText().equals("")){
