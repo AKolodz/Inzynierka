@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="12dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp">
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bluetooth State"
+        android:textOff="@string/if_off"
+        android:textOn="@string/if_on"
+        android:showText="true"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:checked="false"
+        android:id="@+id/switch_bluetooth_on_off"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:clickable="true"
+        android:textColor="@color/Black" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:id="@+id/list_view_BT_devices"
+        android:layout_above="@+id/button_connection_new"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/switch_bluetooth_on_off" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_connection_new"
+        android:id="@+id/button_connection_new"
+        android:layout_alignParentBottom="true" />
+
+
+
+
+</RelativeLayout>

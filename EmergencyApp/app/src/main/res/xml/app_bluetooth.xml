@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Bluetooth">
+        <CheckBoxPreference
+            android:title=""
+            android:summaryOn="The Bluetooth is turned on"
+            android:summaryOff="The Bluetooth is turned off"
+            android:key="title_checkbox"
+            android:defaultValue="false"/>
+        <ListPreference
+            android:title=""
+            android:key="title_dev_list"
+            android:summary="This is the list to choose from">
+        </ListPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -34,4 +34,11 @@
     <string name="button_save">Save</string>
     <string name="confirmation_title1">Are you sure?</string>
     <string name="confirmation_message1">Do you really want to save this Pattern?</string>
+
+    <!-- Bluetooth Settings-->
+    <string name="title_bluetooth">BLUETOOTH</string>
+    <string name="title_BT_devices_list">Available Devices:</string>
+    <string name="button_connection_new">New Connection</string>
+    <string name="if_off">OFF</string>
+    <string name="if_on">ON</string>
 </resources>

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="kolodziejczyk.olek.inzynierka.emergencyapp">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,9 +21,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".HomeScreen" />
-        <activity
-            android:name=".EmergencyDetailActivity" />
-        <activity android:name=".EmergencyListActivity"></activity>
+        <activity android:name=".EmergencyDetailActivity" />
+        <activity android:name=".EmergencyListActivity" />
+        <activity android:name=".BluetoothListActivity"></activity>
     </application>
 
 </manifest>
