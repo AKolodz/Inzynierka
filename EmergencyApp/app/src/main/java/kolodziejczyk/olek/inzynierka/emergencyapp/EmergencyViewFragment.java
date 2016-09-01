@@ -3,6 +3,7 @@ package kolodziejczyk.olek.inzynierka.emergencyapp;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,8 +13,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 
 /**
@@ -33,6 +42,11 @@ public class EmergencyViewFragment extends Fragment {
 
     private boolean firstRun=false;
 
+    private ArrayList<EmergencyObject> patternList;
+
+    SharedPreferences sharedPrefsList;
+    SharedPreferences.Editor listEditor;
+
     public EmergencyViewFragment() {
         // Required empty public constructor
     }
@@ -44,25 +58,49 @@ public class EmergencyViewFragment extends Fragment {
         View fragmentLayout=inflater.inflate(R.layout.fragment_emergency_view,container,false);
         ButterKnife.inject(this,fragmentLayout);
 
+        patternList=new ArrayList<EmergencyObject>();
+        sharedPrefsList = getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
+
+        //GET EXTRAS FROM PREVIOUS ACTIVITY
         Intent intent=getActivity().getIntent();
-        tvTitle.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_TITLE_EXTRA));
-        tvNumber.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_NUMBER_EXTRA));
-        tvMessage.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA));
         firstRun=intent.getExtras().getBoolean(HomeScreen.FIRST_RUN_EXTRA,false);
 
-        //CHECKS IF IT IS FIRST RUN - IF IT'S SO THEN WE SHOULD LOAD LAST OBJECT FROM DATABASE
+        //CHECKS IF IT IS FIRST RUN - IF IT'S SO THEN WE SHOULD LOAD LAST OBJECT FROM SHAREDPREFERENCES
         if(firstRun){
-            Toast.makeText(getActivity().getApplicationContext(),"FIRST RUN!",Toast.LENGTH_SHORT).show();
-            EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
+            /*EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
             dbAdapter.open();
             EmergencyObject emergencyObject=dbAdapter.getLastEmergencyObject();
             dbAdapter.close();
+            */
+            Toast.makeText(getActivity().getApplicationContext(),"FIRST RUN!",Toast.LENGTH_SHORT).show();
+            //GET FULL LIST OF SAVED PATTERNS
+            getPatternListFromSharedPreferences();
 
-            tvTitle.setText(emergencyObject.getTitle());
-            tvNumber.setText(emergencyObject.getPhoneNumber());
-            tvMessage.setText(emergencyObject.getMessage());
+            if(patternList==null){
+                Toast.makeText(getActivity().getBaseContext(),"PUSTA LISTA",Toast.LENGTH_LONG).show();
+                EmergencyObject newFirstObject=new EmergencyObject("Pierwszy Sharedowy","999","Wiadomość teź sharedowa");
+                patternList=new ArrayList<EmergencyObject>();
+                patternList.add(newFirstObject);
+
+                Gson gsonPut=new Gson();
+                String jsonPut=gsonPut.toJson(patternList);
+                listEditor=sharedPrefsList.edit();
+                listEditor.putString(EmergencyDetailActivity.FULL_LIST,jsonPut);
+                listEditor.commit();
+            }
+
+            //GET IT AGAIN IN CASE IT WAS EMPTY
+            getPatternListFromSharedPreferences();
+
+            EmergencyObject firstPatternFromList=patternList.get(0);
+            tvTitle.setText(firstPatternFromList.getTitle());
+            tvNumber.setText(firstPatternFromList.getPhoneNumber());
+            tvMessage.setText(firstPatternFromList.getMessage());
+
         }else{
-            //do nothing
+            tvTitle.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_TITLE_EXTRA));
+            tvNumber.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_NUMBER_EXTRA));
+            tvMessage.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA));
         }
 
         if (tvNumber.getText().equals("")){
@@ -76,5 +114,12 @@ public class EmergencyViewFragment extends Fragment {
             }
         });
         return fragmentLayout;
+    }
+
+    private void getPatternListFromSharedPreferences() {
+        Gson gsonGet=new Gson();
+        String jsonGet=sharedPrefsList.getString(EmergencyDetailActivity.FULL_LIST,null);
+        Type type=new TypeToken<List<EmergencyObject>>(){}.getType();
+        patternList=gsonGet.fromJson(jsonGet,type);
     }
 }

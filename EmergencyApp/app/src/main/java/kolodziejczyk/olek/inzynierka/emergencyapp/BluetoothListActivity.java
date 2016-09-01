@@ -27,5 +27,5 @@ public class BluetoothListActivity extends AppCompatActivity {
     }
 
 
-    }
 }
+

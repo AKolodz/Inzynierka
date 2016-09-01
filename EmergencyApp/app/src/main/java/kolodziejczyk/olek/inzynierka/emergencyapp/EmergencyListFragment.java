@@ -3,6 +3,7 @@ package kolodziejczyk.olek.inzynierka.emergencyapp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
@@ -15,7 +16,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,15 +31,23 @@ public class EmergencyListFragment extends ListFragment {
     private ArrayList<EmergencyObject> exampleList;
     private EmergencyObjectAdapter emergencyObjectAdapter;
     private AlertDialog confirmDialogObject;
+    private SharedPreferences sharedPreferencesPatternList;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-
+        /*
         EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
         dbAdapter.open();
         exampleList=dbAdapter.getAllEmergencyObjects();
         dbAdapter.close();
+        */
+        sharedPreferencesPatternList=getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
+        Gson gsonGet=new Gson();
+        String jsonGet=sharedPreferencesPatternList.getString(EmergencyDetailActivity.FULL_LIST,null);
+        //sprawdzić jsona?
+        Type type=new TypeToken<List<EmergencyObject>>(){}.getType();
+        exampleList=gsonGet.fromJson(jsonGet,type);
 
         emergencyObjectAdapter=new EmergencyObjectAdapter(getContext(),exampleList);
         setListAdapter(emergencyObjectAdapter);

@@ -14,6 +14,8 @@ public class EmergencyDetailActivity extends AppCompatActivity {
 
     public static final String NEW_OBJECT_EXTRA = "New Emergency Object";
 
+    public static final String SHARED_PREFS_FILENAME = "EmergencyObjectsList";
+    public static final String FULL_LIST="SharedList";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
