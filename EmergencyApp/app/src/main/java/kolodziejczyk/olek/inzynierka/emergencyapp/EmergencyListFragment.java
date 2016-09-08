@@ -32,6 +32,7 @@ public class EmergencyListFragment extends ListFragment {
     private EmergencyObjectAdapter emergencyObjectAdapter;
     private AlertDialog confirmDialogObject;
     private SharedPreferences sharedPreferencesPatternList;
+    private SharedPreferences.Editor listEditor;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
@@ -45,7 +46,6 @@ public class EmergencyListFragment extends ListFragment {
         sharedPreferencesPatternList=getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
         Gson gsonGet=new Gson();
         String jsonGet=sharedPreferencesPatternList.getString(EmergencyDetailActivity.FULL_LIST,null);
-        //sprawdzić jsona?
         Type type=new TypeToken<List<EmergencyObject>>(){}.getType();
         exampleList=gsonGet.fromJson(jsonGet,type);
 
@@ -126,7 +126,21 @@ public class EmergencyListFragment extends ListFragment {
                 break;
 
             case R.id.delete:
-                Toast.makeText(getContext(),"Delete", Toast.LENGTH_LONG).show();
+                if(exampleList.size()==1){
+                    Toast.makeText(getContext(),"ACTION FORBIDDEN: List must contain minimum 1 pattern",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getContext(),"Deleting element "+ itemPosition, Toast.LENGTH_LONG).show();
+                    exampleList.remove(itemPosition);
+                    emergencyObjectAdapter.notifyDataSetChanged();
+
+                    Gson gsonPut=new Gson();
+                    String jsonPut=gsonPut.toJson(exampleList);
+                    listEditor = sharedPreferencesPatternList.edit();
+                    listEditor.putString(EmergencyDetailActivity.FULL_LIST,jsonPut);
+                    listEditor.commit();
+                }
+                //remove list[position] item
+                /*
                 EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
                 dbAdapter.open();
                 dbAdapter.deleteEmergencyObject(emergencyObject.getObjectId());
@@ -136,6 +150,7 @@ public class EmergencyListFragment extends ListFragment {
                 emergencyObjectAdapter.notifyDataSetChanged();
 
                 dbAdapter.close();
+                */
                 break;
         }
         return super.onContextItemSelected(item);

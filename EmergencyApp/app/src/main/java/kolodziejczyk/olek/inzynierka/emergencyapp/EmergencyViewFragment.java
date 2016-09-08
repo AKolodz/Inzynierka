@@ -74,11 +74,12 @@ public class EmergencyViewFragment extends Fragment {
             */
             Toast.makeText(getActivity().getApplicationContext(),"FIRST RUN!",Toast.LENGTH_SHORT).show();
             //GET FULL LIST OF SAVED PATTERNS
-            getPatternListFromSharedPreferences();
+            patternList=getPatternListFromSharedPreferences();
 
-            if(patternList==null){
+            if(patternList==null || patternList.size()==0){
+                //gdy nie istnieje lub jest pusta: drugi warunek zabezpiecza przed ewentualnym wyczyszczeniem w jakiś sposób listy schematów
                 Toast.makeText(getActivity().getBaseContext(),"PUSTA LISTA",Toast.LENGTH_LONG).show();
-                EmergencyObject newFirstObject=new EmergencyObject("Pierwszy Sharedowy","999","Wiadomość teź sharedowa");
+                EmergencyObject newFirstObject=new EmergencyObject("Pierwszy Sharedowy","999","Wiadomość też sharedowa");
                 patternList=new ArrayList<EmergencyObject>();
                 patternList.add(newFirstObject);
 
@@ -90,7 +91,7 @@ public class EmergencyViewFragment extends Fragment {
             }
 
             //GET IT AGAIN IN CASE IT WAS EMPTY
-            getPatternListFromSharedPreferences();
+            patternList=getPatternListFromSharedPreferences();
 
             EmergencyObject firstPatternFromList=patternList.get(0);
             tvTitle.setText(firstPatternFromList.getTitle());
@@ -116,10 +117,11 @@ public class EmergencyViewFragment extends Fragment {
         return fragmentLayout;
     }
 
-    private void getPatternListFromSharedPreferences() {
+    private ArrayList<EmergencyObject> getPatternListFromSharedPreferences() {
         Gson gsonGet=new Gson();
         String jsonGet=sharedPrefsList.getString(EmergencyDetailActivity.FULL_LIST,null);
         Type type=new TypeToken<List<EmergencyObject>>(){}.getType();
         patternList=gsonGet.fromJson(jsonGet,type);
+        return patternList;
     }
 }
