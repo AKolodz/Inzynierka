@@ -35,10 +35,11 @@
     <string name="confirmation_title1">Are you sure?</string>
     <string name="confirmation_message1">Do you really want to save this Pattern?</string>
 
-    <!-- Bluetooth Settings-->
+    <!-- Bluetooth List Activity-->
     <string name="title_bluetooth">BLUETOOTH</string>
-    <string name="title_BT_devices_list">Available Devices:</string>
-    <string name="button_connection_new">New Connection</string>
-    <string name="if_off">OFF</string>
-    <string name="if_on">ON</string>
+    <string name="button_connect_paired">Connect to paired</string>
+    <string name="device_information_title">"Your phone is connected with:</string>
+    <string name="button_discover">Discover new BT devices</string>
+    <string name="button_bt_confirm">Confirm</string>
+    <string name="lack_of_BTmodule">"Bluetooth is not supported on this device</string>
 </resources>

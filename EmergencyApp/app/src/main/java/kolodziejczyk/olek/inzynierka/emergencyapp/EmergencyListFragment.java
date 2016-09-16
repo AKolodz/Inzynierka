@@ -99,6 +99,7 @@ public class EmergencyListFragment extends ListFragment {
                 break;
             case EDIT:
                 intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.EDIT);
+                intent.putExtra(EmergencyListActivity.POSITION_TO_EDIT,position);
                 break;
         }
         startActivity(intent);

@@ -16,6 +16,8 @@ public class EmergencyListActivity extends AppCompatActivity {
     public final static String EMERGENCY_NUMBER_EXTRA="kolodziejczyk.olek.inzynierka.emergencyapp.Number";
     public final static String EMERGENCY_MESSAGE_EXTRA="kolodziejczyk.olek.inzynierka.emergencyapp.Message";
     public final static String EMERGENCY_ID_EXTRA = "kolodziejczyk.olek.inzynierka.emergencyapp.Id";
+    public final static String POSITION_TO_EDIT="kolodziejczyk.olek.inzynierka.emergencyapp.Position";
+
 
     @InjectView(R.id.button_add_pattern)
     Button bAddPattern;

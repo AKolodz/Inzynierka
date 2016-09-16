@@ -3,6 +3,7 @@ package kolodziejczyk.olek.inzynierka.emergencyapp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -13,6 +14,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -34,7 +42,14 @@ public class EmergencyEditFragment extends Fragment {
 
     private boolean addEmergencyObject=false;
     private long emergencyObjectId=0;
+    private int editingPosition=0;
+
     private AlertDialog confirmDialogObject;
+
+    private ArrayList<EmergencyObject> patternList;
+
+    private SharedPreferences sharedPrefsList;
+    private SharedPreferences.Editor listEditor;
 
     public EmergencyEditFragment() {
         // Required empty public constructor
@@ -57,6 +72,7 @@ public class EmergencyEditFragment extends Fragment {
         etNumber.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_NUMBER_EXTRA));
         etMessage.setText(intent.getExtras().getString(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA));
         emergencyObjectId=intent.getExtras().getLong(EmergencyListActivity.EMERGENCY_ID_EXTRA,0);
+        editingPosition=intent.getExtras().getInt(EmergencyListActivity.POSITION_TO_EDIT,0);
 
         bSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,14 +91,24 @@ public class EmergencyEditFragment extends Fragment {
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                EmergencyDatabaseAdapter dbAdapter= new EmergencyDatabaseAdapter(getActivity().getBaseContext());
-                dbAdapter.open();
+                /*EmergencyDatabaseAdapter dbAdapter= new EmergencyDatabaseAdapter(getActivity().getBaseContext());
+                dbAdapter.open();*/
+                sharedPrefsList=getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
+                patternList=getPatternListFromSharedPreferences();
                 if(addEmergencyObject){
-                    dbAdapter.createEmergencyObject(etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+"");
+                    patternList.add(0,new EmergencyObject(etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+""));
+                    //dbAdapter.createEmergencyObject(etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+"");
                 }else{
-                    dbAdapter.updateEmergencyObject(emergencyObjectId,etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+"");
+                    //dbAdapter.updateEmergencyObject(emergencyObjectId,etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+"");
+                    patternList.remove(editingPosition);
+                    patternList.add(0,new EmergencyObject(etTitle.getText()+"",etNumber.getText()+"",etMessage.getText()+""));
                 }
-                dbAdapter.close();
+                Gson gsonPut=new Gson();
+                String jsonPut=gsonPut.toJson(patternList);
+                listEditor=sharedPrefsList.edit();
+                listEditor.putString(EmergencyDetailActivity.FULL_LIST,jsonPut);
+                listEditor.commit();
+                //dbAdapter.close();
                 Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyListActivity.class);
                 startActivity(intent);
                 getActivity().finish();
@@ -98,5 +124,14 @@ public class EmergencyEditFragment extends Fragment {
 
         confirmDialogObject=builder.create();
         confirmDialogObject.show();
+    }
+
+    private ArrayList<EmergencyObject> getPatternListFromSharedPreferences() {
+        ArrayList<EmergencyObject> list=new ArrayList<EmergencyObject>();
+        Gson gsonGet=new Gson();
+        String jsonGet=sharedPrefsList.getString(EmergencyDetailActivity.FULL_LIST,null);
+        Type type=new TypeToken<List<EmergencyObject>>(){}.getType();
+        list=gsonGet.fromJson(jsonGet,type);
+        return list;
     }
 }
