@@ -38,7 +38,7 @@
     <!-- Bluetooth List Activity-->
     <string name="title_bluetooth">BLUETOOTH</string>
     <string name="button_connect_paired">Connect to paired</string>
-    <string name="device_information_title">"Your phone is connected with:</string>
+    <string name="device_information_title">"Your phone is connected to:</string>
     <string name="button_discover">Discover new BT devices</string>
     <string name="button_bt_confirm">Confirm</string>
     <string name="lack_of_BTmodule">"Bluetooth is not supported on this device</string>

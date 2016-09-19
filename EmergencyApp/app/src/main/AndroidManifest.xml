@@ -21,6 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".BtDeviceList"
+            android:theme="@android:style/Theme.Dialog"
+            android:label="Discovered Devices:" />
         <activity android:name=".HomeScreen" />
         <activity android:name=".EmergencyDetailActivity" />
         <activity android:name=".EmergencyListActivity" />

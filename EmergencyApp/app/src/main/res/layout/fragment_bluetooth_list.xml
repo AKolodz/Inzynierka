@@ -13,8 +13,8 @@
         android:text="@string/button_connect_paired"
         android:id="@+id/button_paired"/>
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/button_discover"
         android:id="@+id/button_discover"/>
     <TextView
@@ -30,7 +30,9 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_bt_confirm"/>
+        android:text="@string/button_bt_confirm"
+        android:id="@+id/button_confirmation"
+        />
 
 
 
