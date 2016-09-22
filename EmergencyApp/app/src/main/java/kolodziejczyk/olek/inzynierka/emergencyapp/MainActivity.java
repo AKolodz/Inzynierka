@@ -16,6 +16,8 @@ import butterknife.InjectView;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Intent intent=null;
+
     @InjectView(R.id.text_view_login)
     TextView tvLogin;
     @InjectView(R.id.text_view_password)
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 String correctPassword="Password1";
 
                 if (enteredLogin.equals(correctLogin)&& enteredPassword.equals(correctPassword)){
-                    Intent intent= new Intent(getApplicationContext(),HomeScreen.class);
+                    intent=new Intent(getApplicationContext(),HomeScreen.class);
                     startActivity(intent);
                     finish();
                     Toast.makeText(getApplicationContext(),"Hello "+correctLogin,Toast.LENGTH_SHORT).show();

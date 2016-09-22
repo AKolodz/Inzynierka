@@ -5,31 +5,22 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
-import android.os.Handler;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -45,6 +36,9 @@ public class BluetoothListFragment extends Fragment {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     private static final int MESSAGE_READ = 9999;
     private static final int SUCCESS_CONNECT = 0;
+    public static final String WHAT_TO_DO="kolodziejczyk.olek.inzynierka.emergencyapp.whattodo";
+
+
     private BluetoothAdapter bluetoothAdapter=null;
     private boolean isConnected=false;
     private static String macAddress=null;
@@ -52,7 +46,6 @@ public class BluetoothListFragment extends Fragment {
     private ConnectThread connectThread=null;
     private ConnectedThread connectedThread=null;
 
-    public static final String WHAT_TO_DO="kolodziejczyk.olek.inzynierka.emergencyapp.whattodo";
     public enum BtAction{GET_PAIRED,DISCOVER_NEW}
 
     @InjectView(R.id.button_paired)
@@ -70,6 +63,7 @@ public class BluetoothListFragment extends Fragment {
             super.handleMessage(msg);
             switch(msg.what){
                 case SUCCESS_CONNECT:
+                    Toast.makeText(getActivity().getApplicationContext(),"Connected",Toast.LENGTH_SHORT).show();
                     break;
                 case MESSAGE_READ:
                     byte[] readBuff=(byte[]) msg.obj;
@@ -113,6 +107,17 @@ public class BluetoothListFragment extends Fragment {
                 Intent intentList=new Intent(getActivity().getBaseContext(),BtDeviceList.class);
                 intentList.putExtra(BluetoothListFragment.WHAT_TO_DO,BtAction.DISCOVER_NEW);
                 startActivityForResult(intentList,REQUEST_CONNECTION);
+            }
+        });
+
+        bConfirmation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyDetailActivity.class);
+                intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.VIEW);
+                //intent.putExtra(BtDeviceList.MAC????,macAddress); tam jeśli jest puste to prosimy o wybór urządzenia, jesli nie to podtrzymujemy połączenie
+                startActivity(intent);
+                getActivity().finish();
             }
         });
 
@@ -168,7 +173,7 @@ public class BluetoothListFragment extends Fragment {
 
                     isConnected=true;
                     bConnectToPairedDevices.setText("Disconnect");
-                    Toast.makeText(getActivity().getBaseContext(),"Connected: "+macAddress,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity().getBaseContext(),"Connecting: "+macAddress,Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(getActivity().getBaseContext(),"Obtaining MAC address FAILED",Toast.LENGTH_SHORT).show();
                 }
@@ -214,6 +219,7 @@ public class BluetoothListFragment extends Fragment {
             }
 
             // Do work to manage the connection (in a separate thread)
+            mHandler.obtainMessage(SUCCESS_CONNECT).sendToTarget();
             manageConnectedSocket(mmSocket);
         }
 

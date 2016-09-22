@@ -25,7 +25,7 @@ public class BtDeviceList extends ListActivity{
     private ArrayAdapter<String> arrayAdapter=null;
     private BluetoothAdapter bluetoothAdapter=null;
     private BroadcastReceiver mReceiver=null;
-
+    private IntentFilter filter=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -65,7 +65,7 @@ public class BtDeviceList extends ListActivity{
             }
         };
 // Register the BroadcastReceiver
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
     }
 
