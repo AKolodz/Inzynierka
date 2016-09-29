@@ -115,7 +115,8 @@ public class BluetoothListFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyDetailActivity.class);
                 intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.VIEW);
-                //intent.putExtra(BtDeviceList.MAC????,macAddress); tam jeśli jest puste to prosimy o wybór urządzenia, jesli nie to podtrzymujemy połączenie
+                intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,true);
+                intent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
                 startActivity(intent);
                 getActivity().finish();
             }
@@ -140,13 +141,6 @@ public class BluetoothListFragment extends Fragment {
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     }
 
-
-    @Override
-    public void onPause() {
-        //getActivity().unregisterReceiver(receiver);
-        super.onPause();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //super.onActivityResult(requestCode, resultCode, data); //should I comment this line?
@@ -166,10 +160,10 @@ public class BluetoothListFragment extends Fragment {
                 if(resultCode==Activity.RESULT_OK){
                     macAddress=data.getExtras().getString(BtDeviceList.MAC_ADDRESS);
                     deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);
-                    bluetoothAdapter.cancelDiscovery();
+                    //bluetoothAdapter.cancelDiscovery();
 
-                    connectThread=new ConnectThread(deviceToConnectWith);
-                    connectThread.start();
+                    //connectThread=new ConnectThread(deviceToConnectWith);
+                    //connectThread.start();
 
                     isConnected=true;
                     bConnectToPairedDevices.setText("Disconnect");

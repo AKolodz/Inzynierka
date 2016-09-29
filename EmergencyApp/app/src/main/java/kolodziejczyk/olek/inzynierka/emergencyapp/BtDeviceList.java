@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class BtDeviceList extends ListActivity{
 
-    public static final String MAC_ADDRESS = null;
+    public static final String MAC_ADDRESS = "kolodziejczyk.olek.inzynierka.emergencyapp.MAC";
 
     private ArrayAdapter<String> arrayAdapter=null;
     private BluetoothAdapter bluetoothAdapter=null;

@@ -1,26 +1,44 @@
 package kolodziejczyk.olek.inzynierka.emergencyapp;
 
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
+import kolodziejczyk.olek.inzynierka.emergencyapp.BluetoothService.MyBinder;
 
 public class EmergencyDetailActivity extends AppCompatActivity {
 
-    public static final String NEW_OBJECT_EXTRA = "New Emergency Object";
+    private String macAddress=null;
 
+    BluetoothService myService;
+    boolean isBound=false;
+
+    public static final String NEW_OBJECT_EXTRA = "New Emergency Object";
     public static final String SHARED_PREFS_FILENAME = "EmergencyObjectsList";
     public static final String FULL_LIST="SharedList";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_detail);
         createAndAddFragment();
+
+        Intent intent=getIntent();
+        macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS);
+
+        Intent serviceIntent=new Intent(EmergencyDetailActivity.this, BluetoothService.class);
+        serviceIntent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
+        bindService(serviceIntent,myConnection, Context.BIND_AUTO_CREATE);
+        startService(serviceIntent);
+        //myService.showToast();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -74,4 +92,18 @@ public class EmergencyDetailActivity extends AppCompatActivity {
 
         fragmentTransaction.commit();
     }
+
+    private ServiceConnection myConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            MyBinder myBinder=(MyBinder) iBinder;
+            myService=myBinder.getService();
+            isBound=true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isBound=false;
+        }
+    };
 }

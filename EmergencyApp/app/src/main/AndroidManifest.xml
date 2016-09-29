@@ -21,13 +21,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BtDeviceList"
-            android:theme="@android:style/Theme.Dialog"
-            android:label="Discovered Devices:" />
+        <activity
+            android:name=".BtDeviceList"
+            android:label="Discovered Devices:"
+            android:theme="@android:style/Theme.Dialog" />
         <activity android:name=".HomeScreen" />
         <activity android:name=".EmergencyDetailActivity" />
         <activity android:name=".EmergencyListActivity" />
-        <activity android:name=".BluetoothListActivity"></activity>
+        <activity android:name=".BluetoothListActivity" />
+
+        <service
+            android:name=".BluetoothService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
