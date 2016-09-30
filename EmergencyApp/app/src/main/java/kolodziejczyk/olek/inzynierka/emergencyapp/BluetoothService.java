@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import java.util.UUID;
 
 public class BluetoothService extends Service {
@@ -25,10 +27,12 @@ public class BluetoothService extends Service {
     private BluetoothDevice deviceToConnectWith=null;
     private ConnectThread connectThread=null;
     private ConnectedThread connectedThread=null;
-
+    private SharedPreferences sharedPreferencesMacAddress;
+    private SharedPreferences.Editor macAddressEditor;
 
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     private static final String TAG = "kolodziejczyk.olek";
+    public static final String SHARED_PREFS_MAC_ADDRESS="kolodziejczyk.olek.inzynierka.emergencyapp.SharedPrefsMac";
     private static final int SUCCESS_CONNECT = 0;
     private static final int MESSAGE_READ = 9999;
 
@@ -40,6 +44,10 @@ public class BluetoothService extends Service {
 
                 case SUCCESS_CONNECT:
                     Log.i(TAG,"Handler: SUCCESS CONNECT");
+                    sharedPreferencesMacAddress=getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
+                    macAddressEditor=sharedPreferencesMacAddress.edit();
+                    macAddressEditor.putString(BluetoothListFragment.SHARED_PREFS_MAC_ADDRESS,macAddress);
+                    macAddressEditor.commit();
                     break;
 
                 case MESSAGE_READ:
@@ -56,15 +64,30 @@ public class BluetoothService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        Log.i(TAG,"OnCreate");
+        super.onCreate();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         bluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
         macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS);
-        Log.i(TAG,"onStartCommand "+macAddress);
-        if(macAddress!=null){
-            deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);
+
+        if(macAddress==null){
+            sharedPreferencesMacAddress=getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
+            macAddress=sharedPreferencesMacAddress.getString(BluetoothService.SHARED_PREFS_MAC_ADDRESS,null);
+            Log.i(TAG,"onStartCommand "+macAddress);
+            if(macAddress==null){
+                Log.i(TAG,"Saved macAddress is incorrect"+macAddress); //go to BluetoothListActivity and select another device
+                Intent intentGetMac=new Intent(BluetoothService.this,BluetoothListActivity.class);
+                startActivity(intentGetMac);
+                stopSelf();
+            }
         }else{
-            //get from latest sharedprefs
+            //do nothing
         }
+        deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);
         bluetoothAdapter.cancelDiscovery();
         Runnable runnable=new Runnable() {
             @Override
@@ -82,6 +105,7 @@ public class BluetoothService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.i(TAG,"onDestroy()");
         super.onDestroy();
     }
 

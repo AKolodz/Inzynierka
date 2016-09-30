@@ -16,8 +16,6 @@ import butterknife.InjectView;
 public class HomeScreen extends AppCompatActivity {
 
     private Intent intent=null;
-    private boolean bluetoothOn=false;
-    private BluetoothAdapter bluetoothAdapter=null;
 
     public static final String FIRST_RUN_EXTRA = "If it's first run";
 
@@ -36,14 +34,7 @@ public class HomeScreen extends AppCompatActivity {
         bEmergency.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkBtState();
-                if(bluetoothOn){
-                    intent= new Intent(getApplicationContext(),EmergencyDetailActivity.class);
-                    intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA,MainActivity.FragmentToLaunch.VIEW);
-                    intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,true);
-                }else{
-                    intent= new Intent(getApplicationContext(),BluetoothListActivity.class);
-                }
+                intent= new Intent(getApplicationContext(),BluetoothListActivity.class);
                 startActivity(intent);
             }
         });
@@ -56,19 +47,6 @@ public class HomeScreen extends AppCompatActivity {
                 //startActivity(intent);
             }
         });
-    }
-
-    private void checkBtState() {
-        bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
-        if(bluetoothAdapter==null){
-            Toast.makeText(getBaseContext(),R.string.lack_of_BTmodule,Toast.LENGTH_LONG).show();
-        }else{
-            if(bluetoothAdapter.isEnabled()){
-                bluetoothOn=true;
-            }else{
-                bluetoothOn=false;
-            }
-        }
     }
 
     @Override

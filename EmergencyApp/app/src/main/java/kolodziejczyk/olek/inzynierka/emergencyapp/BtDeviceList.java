@@ -21,6 +21,8 @@ import java.util.Set;
 public class BtDeviceList extends ListActivity{
 
     public static final String MAC_ADDRESS = "kolodziejczyk.olek.inzynierka.emergencyapp.MAC";
+    public static final String DEVICE_NAME = "kolodziejczyk.olek.inzynierka.emergencyapp.NAME";
+
 
     private ArrayAdapter<String> arrayAdapter=null;
     private BluetoothAdapter bluetoothAdapter=null;
@@ -88,9 +90,11 @@ public class BtDeviceList extends ListActivity{
         bluetoothAdapter.cancelDiscovery();
         String generalInfo=((TextView)view).getText().toString();
         String macAddress=generalInfo.substring(generalInfo.length()-17);
+        String deviceName=generalInfo.substring(0,generalInfo.length()-17);
 
         Intent intentMacReturn=new Intent();
         intentMacReturn.putExtra(MAC_ADDRESS,macAddress);
+        intentMacReturn.putExtra(DEVICE_NAME,deviceName);
         setResult(RESULT_OK,intentMacReturn);
         finish();
     }
