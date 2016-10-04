@@ -33,8 +33,10 @@ public class BluetoothService extends Service {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     private static final String TAG = "kolodziejczyk.olek";
     public static final String SHARED_PREFS_MAC_ADDRESS="kolodziejczyk.olek.inzynierka.emergencyapp.SharedPrefsMac";
+
     private static final int SUCCESS_CONNECT = 0;
     private static final int MESSAGE_READ = 9999;
+    private static final int UNSUCCESS_CONNECT = 11;
 
     Handler mHandler=new Handler(){
         @Override
@@ -50,15 +52,26 @@ public class BluetoothService extends Service {
                     macAddressEditor.commit();
                     break;
 
+                case UNSUCCESS_CONNECT:
+                    Log.i(TAG,"Handler: Connection Failed");
+                    Toast.makeText(getApplicationContext(),"HANDLER",Toast.LENGTH_SHORT).show();
+                    break;
+
                 case MESSAGE_READ:
                     byte[] readBuff=(byte[]) msg.obj;
                     String receivedMsg=new String(readBuff);
-                    Toast.makeText(getApplicationContext(),receivedMsg,Toast.LENGTH_SHORT).show();
                     Log.i(TAG,"Handler: MESSAGE");
+                    if(!receivedMsg.equals(null)) {
+                        exampleFunction();
+                    }
                     break;
             }
         }
     };
+
+    public void exampleFunction() {
+        Toast.makeText(getApplicationContext(),"To działa",Toast.LENGTH_SHORT).show();
+    }
 
     public BluetoothService() {
     }
@@ -146,17 +159,18 @@ public class BluetoothService extends Service {
             try {
                 // Connect the device through the socket. This will block
                 // until it succeeds or throws an exception
+                Log.i(TAG,"ConnectThread(run) Connecting");
                 mmSocket.connect();
             } catch (IOException connectException) {
                 // Unable to connect; close the socket and get out
                 try {
+                    Log.i(TAG,"ConnectThread(run) Connection Failure");
+                    mHandler.obtainMessage(UNSUCCESS_CONNECT).sendToTarget();
                     mmSocket.close();
                     //isConnected=false;
-                    Toast.makeText(getBaseContext(),"Error occurred: "+connectException,Toast.LENGTH_LONG).show();
                 } catch (IOException closeException) { }
                 return;
             }
-
             // Do work to manage the connection (in a separate thread)
             mHandler.obtainMessage(SUCCESS_CONNECT).sendToTarget();
             manageConnectedSocket(mmSocket);

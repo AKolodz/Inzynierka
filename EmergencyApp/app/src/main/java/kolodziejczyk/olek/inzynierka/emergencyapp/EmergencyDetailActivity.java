@@ -2,7 +2,11 @@ package kolodziejczyk.olek.inzynierka.emergencyapp;
 
 
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +17,8 @@ import android.view.MenuItem;
 
 public class EmergencyDetailActivity extends AppCompatActivity {
 
+    BluetoothService bluetoothService;
+
     public static final String NEW_OBJECT_EXTRA = "New Emergency Object";
     public static final String SHARED_PREFS_FILENAME = "EmergencyObjectsList";
     public static final String FULL_LIST="SharedList";
@@ -22,6 +28,9 @@ public class EmergencyDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_detail);
         createAndAddFragment();
+
+        Intent i=new Intent(this,BluetoothService.class);
+        bindService(i,myConnection, Context.BIND_AUTO_CREATE);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -37,8 +46,9 @@ public class EmergencyDetailActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }else if(id==R.id.bluetooth){
-            Intent intent=new Intent(this,BluetoothListActivity.class);
-            startActivity(intent);
+            //Intent intent=new Intent(this,BluetoothListActivity.class);
+            //startActivity(intent);
+            bluetoothService.exampleFunction();
             return  true;
         }
 
@@ -75,5 +85,18 @@ public class EmergencyDetailActivity extends AppCompatActivity {
 
         fragmentTransaction.commit();
     }
+
+    private ServiceConnection myConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            BluetoothService.MyBinder myBinder=(BluetoothService.MyBinder) iBinder;
+            bluetoothService=myBinder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
 
 }

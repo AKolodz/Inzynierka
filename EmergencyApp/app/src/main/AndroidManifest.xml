@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeScreen"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -25,7 +25,7 @@
             android:name=".BtDeviceList"
             android:label="Discovered Devices:"
             android:theme="@android:style/Theme.Dialog" />
-        <activity android:name=".HomeScreen" />
+        <!--<activity android:name=".HomeScreen" /> -->
         <activity android:name=".EmergencyDetailActivity" />
         <activity android:name=".EmergencyListActivity" />
         <activity android:name=".BluetoothListActivity" />

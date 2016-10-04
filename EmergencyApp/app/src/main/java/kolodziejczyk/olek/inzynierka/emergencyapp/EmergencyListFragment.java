@@ -37,12 +37,7 @@ public class EmergencyListFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-        /*
-        EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
-        dbAdapter.open();
-        exampleList=dbAdapter.getAllEmergencyObjects();
-        dbAdapter.close();
-        */
+
         sharedPreferencesPatternList=getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
         Gson gsonGet=new Gson();
         String jsonGet=sharedPreferencesPatternList.getString(EmergencyDetailActivity.FULL_LIST,null);
@@ -140,18 +135,6 @@ public class EmergencyListFragment extends ListFragment {
                     listEditor.putString(EmergencyDetailActivity.FULL_LIST,jsonPut);
                     listEditor.commit();
                 }
-                //remove list[position] item
-                /*
-                EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
-                dbAdapter.open();
-                dbAdapter.deleteEmergencyObject(emergencyObject.getObjectId());
-
-                exampleList.clear();
-                exampleList.addAll(dbAdapter.getAllEmergencyObjects());
-                emergencyObjectAdapter.notifyDataSetChanged();
-
-                dbAdapter.close();
-                */
                 break;
         }
         return super.onContextItemSelected(item);

@@ -67,17 +67,12 @@ public class EmergencyViewFragment extends Fragment {
 
         //CHECKS IF IT IS FIRST RUN - IF IT'S SO THEN WE SHOULD LOAD LAST OBJECT FROM SHAREDPREFERENCES
         if(firstRun){
-            /*EmergencyDatabaseAdapter dbAdapter=new EmergencyDatabaseAdapter(getActivity().getBaseContext());
-            dbAdapter.open();
-            EmergencyObject emergencyObject=dbAdapter.getLastEmergencyObject();
-            dbAdapter.close();
-            */
             Toast.makeText(getActivity().getApplicationContext(),"FIRST RUN!",Toast.LENGTH_SHORT).show();
             //GET FULL LIST OF SAVED PATTERNS
             patternList=getPatternListFromSharedPreferences();
 
             if(patternList==null || patternList.size()==0){
-                //gdy nie istnieje lub jest pusta: drugi warunek zabezpiecza przed ewentualnym wyczyszczeniem w jakiś sposób listy schematów
+                //gdy nie istnieje lub jest pusta: dodaj domyślnyb. Drugi warunek zabezpiecza przed ewentualnym wyczyszczeniem w jakiś sposób listy schematów
                 Toast.makeText(getActivity().getBaseContext(),"PUSTA LISTA",Toast.LENGTH_LONG).show();
                 EmergencyObject newFirstObject=new EmergencyObject("Pierwszy Sharedowy","999","Wiadomość też sharedowa");
                 patternList=new ArrayList<EmergencyObject>();

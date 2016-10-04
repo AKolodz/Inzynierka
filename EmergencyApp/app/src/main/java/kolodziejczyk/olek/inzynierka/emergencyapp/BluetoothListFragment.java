@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,7 @@ public class BluetoothListFragment extends Fragment {
     private static final int SUCCESS_CONNECT = 0;
     public static final String WHAT_TO_DO="kolodziejczyk.olek.inzynierka.emergencyapp.whattodo";
     public static final String SHARED_PREFS_MAC_ADDRESS="kolodziejczyk.olek.inzynierka.emergencyapp.SharedPrefsMac";
+    private static final String TAG = "kolodziejczyk.olek";
 
     private BluetoothAdapter bluetoothAdapter=null;
     private boolean isConnected=false;
@@ -67,6 +69,8 @@ public class BluetoothListFragment extends Fragment {
     TextView tvDeviceName;
     @InjectView(R.id.text_view_device_information_mac)
     TextView tvDeviceMac;
+    @InjectView(R.id.text_view_bt_off_usage)
+    TextView tvBtOff;
 
     public BluetoothListFragment() {
         // Required empty public constructor
@@ -112,9 +116,18 @@ public class BluetoothListFragment extends Fragment {
             public void onClick(View view) {
                 Intent serviceIntent=new Intent(getActivity().getApplicationContext(), BluetoothService.class);
                 serviceIntent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
-                getActivity().bindService(serviceIntent,myConnection, Context.BIND_AUTO_CREATE);
                 getActivity().startService(serviceIntent);
 
+                Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyDetailActivity.class);
+                intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.VIEW);
+                intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,true);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
+        tvBtOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyDetailActivity.class);
                 intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.VIEW);
                 intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,true);
@@ -149,41 +162,29 @@ public class BluetoothListFragment extends Fragment {
                 if(resultCode== Activity.RESULT_OK){
                     Toast.makeText(getActivity().getBaseContext(),"Bluetooth is activated!",Toast.LENGTH_SHORT).show();
                 }else if(resultCode==Activity.RESULT_CANCELED){
-                    Toast.makeText(getActivity().getBaseContext(),"Bluetooth must be enable!",Toast.LENGTH_SHORT).show();
-                    getActivity().finish();
+                    Toast.makeText(getActivity().getBaseContext(),"Bluetooth should be enabled if you want to connect with remote device!",Toast.LENGTH_LONG).show();
                 }else{
+                    Log.i(TAG,"ENABLING FAIL: Else reason");
                     Toast.makeText(getActivity().getBaseContext(),"Bluetooth is NOT activated, try again",Toast.LENGTH_SHORT).show();
                     getActivity().finish();
                 }
                 break;
             case REQUEST_CONNECTION:
                 if(resultCode==Activity.RESULT_OK){
+                    Log.i(TAG,"RESULT OK");
+
                     macAddress=data.getExtras().getString(BtDeviceList.MAC_ADDRESS);
                     deviceName=data.getExtras().getString(BtDeviceList.DEVICE_NAME);
                     tvDeviceName.setText(deviceName);
                     tvDeviceMac.setText(macAddress);
 
                 }else{
+                    Log.i(TAG,"CONNECTING FAIL: Else reason");
                     Toast.makeText(getActivity().getBaseContext(),"Obtaining MAC address FAILED",Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
 
     }
-    private ServiceConnection myConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            BluetoothService.MyBinder myBinder=(BluetoothService.MyBinder) iBinder;
-            myService=myBinder.getService();
-            isBound=true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            isBound=false;
-        }
-    };
-
-
 
 }
