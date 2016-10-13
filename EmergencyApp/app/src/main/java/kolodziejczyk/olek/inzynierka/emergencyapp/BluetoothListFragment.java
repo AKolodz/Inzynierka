@@ -128,6 +128,11 @@ public class BluetoothListFragment extends Fragment {
         tvBtOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent serviceIntent=new Intent(getActivity().getApplicationContext(), BluetoothService.class);
+                macAddress="null";
+                serviceIntent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
+                getActivity().startService(serviceIntent);
+
                 Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyDetailActivity.class);
                 intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.VIEW);
                 intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,true);

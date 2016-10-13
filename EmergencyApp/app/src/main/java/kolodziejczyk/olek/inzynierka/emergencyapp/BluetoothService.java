@@ -6,12 +6,22 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +29,8 @@ import java.io.OutputStream;
 
 import java.util.UUID;
 
-public class BluetoothService extends Service {
+public class BluetoothService extends Service implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private final IBinder myBinder=new MyBinder();
     private BluetoothAdapter bluetoothAdapter=null;
@@ -30,13 +41,22 @@ public class BluetoothService extends Service {
     private SharedPreferences sharedPreferencesMacAddress;
     private SharedPreferences.Editor macAddressEditor;
 
+    private GoogleApiClient mGoogleApiClient = null;
+    private LocationRequest mLocationRequest=null;
+    private Location mLastLocation=null;
+    private static int UPDATE_INTERVAL=10000;
+    private static int FASTEST_INTERVAL=5000;
+    private static int DISPLACEMENT=10;
+    private double latitude=0;
+    private double longitude=0;
+
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-    private static final String TAG = "kolodziejczyk.olek";
+    public static final String TAG = "kolodziejczyk.olek";
     public static final String SHARED_PREFS_MAC_ADDRESS="kolodziejczyk.olek.inzynierka.emergencyapp.SharedPrefsMac";
 
     private static final int SUCCESS_CONNECT = 0;
-    private static final int MESSAGE_READ = 9999;
     private static final int UNSUCCESS_CONNECT = 11;
+    protected static final int MESSAGE_READ = 9999;
 
     Handler mHandler=new Handler(){
         @Override
@@ -54,24 +74,29 @@ public class BluetoothService extends Service {
 
                 case UNSUCCESS_CONNECT:
                     Log.i(TAG,"Handler: Connection Failed");
-                    Toast.makeText(getApplicationContext(),"HANDLER",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Device/MAC address invalid",Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent(getApplicationContext(),BluetoothListActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                     break;
 
                 case MESSAGE_READ:
+                    Log.i(TAG,"Handler: MESSAGE");
+
                     byte[] readBuff=(byte[]) msg.obj;
                     String receivedMsg=new String(readBuff);
-                    Log.i(TAG,"Handler: MESSAGE");
+
                     if(!receivedMsg.equals(null)) {
-                        exampleFunction();
+                        if(checkGPState()){
+                            runGPS();
+                        }else{
+                            Log.i(TAG,"MESSAGE: GPS OFF");
+                        }
                     }
                     break;
             }
         }
     };
-
-    public void exampleFunction() {
-        Toast.makeText(getApplicationContext(),"To działa",Toast.LENGTH_SHORT).show();
-    }
 
     public BluetoothService() {
     }
@@ -80,6 +105,17 @@ public class BluetoothService extends Service {
     public void onCreate() {
         Log.i(TAG,"OnCreate");
         super.onCreate();
+    }
+
+    protected boolean checkGPState() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            Log.i(TAG,"GPS OFF");
+            return false;
+        }else{
+            Log.i(TAG,"GPS ON");
+            return true;
+        }
     }
 
     @Override
@@ -97,17 +133,31 @@ public class BluetoothService extends Service {
                 startActivity(intentGetMac);
                 stopSelf();
             }
-        }else{
-            //do nothing
+        }else if(!macAddress.equals("null")){
+            Log.i(TAG,"macAddress not 'null' ");
+            deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);
+            bluetoothAdapter.cancelDiscovery();
         }
-        deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);
-        bluetoothAdapter.cancelDiscovery();
+
         Runnable runnable=new Runnable() {
             @Override
             public void run() {
                 Log.i(TAG,"New Thread");
-                connectThread=new ConnectThread(deviceToConnectWith);
-                connectThread.start();
+                if(deviceToConnectWith!=null){
+                    connectThread=new ConnectThread(deviceToConnectWith);
+                    connectThread.start();
+                }
+
+
+                if(checkPlayServices()){
+                    buildGoogleApiClient();
+                    createLocationRequest();
+                }
+
+                if (mGoogleApiClient != null) {
+                    mGoogleApiClient.connect();
+                    Log.i(TAG,"Connect Client");
+                }
             }
         };
         Thread thread=new Thread(runnable);
@@ -119,7 +169,111 @@ public class BluetoothService extends Service {
     @Override
     public void onDestroy() {
         Log.i(TAG,"onDestroy()");
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
         super.onDestroy();
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest=new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    private boolean checkPlayServices() {
+        int resultCode= GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if(resultCode!= ConnectionResult.SUCCESS){
+            if(GooglePlayServicesUtil.isUserRecoverableError(resultCode)){
+                Log.i(TAG,"Recoverable error occured: "+resultCode);
+            }else{
+                Log.i(TAG,"This device doesn't support GPS");
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        getLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation=location;
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    public void runGPS() {
+        Log.i(TAG,"runGPS Function");
+        startLocationUpdates();
+
+        Runnable run=new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG,"It took 5 sec");
+                stopLocationUpdate();
+                getLocation();
+                showLocation();
+        }
+        };
+        mHandler.postDelayed(run,5000);
+
+
+        /*try {
+            Log.i(TAG,"Now we go sleep...");
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Log.i(TAG,"And wake up!");
+        stopLocationUpdate();
+        getLocation();*/
+    }
+
+    private void getLocation() {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            latitude= mLastLocation.getLatitude();
+            longitude=mLastLocation.getLongitude();
+            Log.i(TAG,latitude +"\t"+longitude);
+
+        }else{
+            Log.i(TAG,"Couldn't get the location, make sure that GPS is enabled");
+        }
+    }
+
+    protected void showLocation() {
+        Toast.makeText(getApplicationContext(),latitude +"\t"+longitude,Toast.LENGTH_SHORT).show();
+    }
+
+    private void stopLocationUpdate() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+    }
+
+    private void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,this);
     }
 
     @Override
@@ -131,7 +285,6 @@ public class BluetoothService extends Service {
         BluetoothService getService(){
             return BluetoothService.this;
         }
-
     }
 
     private class ConnectThread extends Thread {
