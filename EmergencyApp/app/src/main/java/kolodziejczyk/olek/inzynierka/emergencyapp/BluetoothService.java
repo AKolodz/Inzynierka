@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -32,6 +33,9 @@ import java.util.UUID;
 public class BluetoothService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    public static final String USERS_MESSAGE = "kolodziejczyk.olek.inzynierka.emergencyapp.UsersMessage";
+    public static final String USERS_NUMBER = "kolodziejczyk.olek.inzynierka.emergencyapp.UsersNumber";
+
     private final IBinder myBinder=new MyBinder();
     private BluetoothAdapter bluetoothAdapter=null;
     private static String macAddress=null;
@@ -47,8 +51,11 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
     private static int UPDATE_INTERVAL=10000;
     private static int FASTEST_INTERVAL=5000;
     private static int DISPLACEMENT=10;
-    private double latitude=0;
-    private double longitude=0;
+    private static long TIME_FOR_LOCATION_UPDATE=5000;
+    private double latitude;
+    private double longitude;
+    private String emergencyNumber;
+    private String emergencyMessage;
 
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     public static final String TAG = "kolodziejczyk.olek";
@@ -89,9 +96,10 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
                     if(!receivedMsg.equals(null)) {
                         if(checkGPState()){
-                            runGPS();
+                            updateLocationAndSendMessage();
                         }else{
                             Log.i(TAG,"MESSAGE: GPS OFF");
+                            //TODO: Put last known location and inform about it inside message;
                         }
                     }
                     break;
@@ -104,7 +112,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     @Override
     public void onCreate() {
-        Log.i(TAG,"OnCreate");
+        Log.i(TAG,"OnCreate SERVICE");
         super.onCreate();
     }
 
@@ -121,10 +129,15 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG,"OnStartCommand SERVICE");
         deviceToConnectWith=null; //have to be here to work correctly after changing working mode from "with external device" to "without"
         bluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
         macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS);
-
+        emergencyNumber=intent.getExtras().getString(BluetoothService.USERS_NUMBER);
+        emergencyMessage = intent.getExtras().getString(BluetoothService.USERS_MESSAGE);
+        Log.i(TAG,"SERVICE Mac: "+macAddress);
+        Log.i(TAG,"SERVICE Message: "+emergencyMessage);
+        Log.i(TAG,"SERVICE Number: "+emergencyNumber);
 
         if(macAddress==null){
             sharedPreferencesMacAddress=getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
@@ -226,21 +239,31 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     }
 
-    public void runGPS() {
-        Log.i(TAG,"runGPS Function");
+    protected void updateLocationAndSendMessage() {
+        longitude=0;
+        latitude=0;
+
         startLocationUpdates();
 
         Runnable run=new Runnable() {
             @Override
             public void run() {
-                Log.i(TAG,"It took 5 sec");
                 stopLocationUpdate();
                 getLocation();
                 showLocation();
+                sendSMS();
         }
         };
-        mHandler.postDelayed(run,5000);
+        mHandler.postDelayed(run,TIME_FOR_LOCATION_UPDATE);
     }
+
+    protected void sendSMS() {
+        SmsManager smsManager=SmsManager.getDefault();
+        smsManager.sendTextMessage(emergencyNumber,null,"My Location:\nLATITUDE: "+latitude+"\nLONGITUDE: "+longitude,null,null);
+        smsManager.sendTextMessage(emergencyNumber,null,emergencyMessage,null,null);
+        //podzielone ze względu na pojawiający się błąd Android  java.lang.SecurityException: Requires READ_PHONE_STATE: Neither user 10042 nor current process has android.permission.READ_PHONE_STATE.
+        Log.i(TAG,"Sms");
+}
 
     private void getLocation() {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);

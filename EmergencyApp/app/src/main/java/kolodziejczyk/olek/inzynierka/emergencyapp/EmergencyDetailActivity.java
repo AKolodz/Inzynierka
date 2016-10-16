@@ -51,7 +51,7 @@ public class EmergencyDetailActivity extends AppCompatActivity {
             return true;
         }else if(id==R.id.bluetooth){
             if(bluetoothService.checkGPState()) {
-                bluetoothService.runGPS();
+                bluetoothService.updateLocationAndSendMessage();
             }else{
                 Toast.makeText(getApplicationContext(),"GPS is not activated",Toast.LENGTH_SHORT).show();
                 createTurningOnGpsWindow();
@@ -62,7 +62,6 @@ public class EmergencyDetailActivity extends AppCompatActivity {
     }
 
     private void createTurningOnGpsWindow() {
-        //TODO:
         Log.i(BluetoothService.TAG,"GPS Window");
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setTitle(R.string.GPS_confirmation_title);

@@ -72,7 +72,7 @@ public class EmergencyViewFragment extends Fragment {
             patternList=getPatternListFromSharedPreferences();
 
             if(patternList==null || patternList.size()==0){
-                //gdy nie istnieje lub jest pusta: dodaj domyślnyb. Drugi warunek zabezpiecza przed ewentualnym wyczyszczeniem w jakiś sposób listy schematów
+                //gdy nie istnieje lub jest pusta: dodaj domyślny. Drugi warunek zabezpiecza przed ewentualnym wyczyszczeniem w jakiś sposób listy schematów
                 Toast.makeText(getActivity().getBaseContext(),"PUSTA LISTA",Toast.LENGTH_LONG).show();
                 EmergencyObject newFirstObject=new EmergencyObject("Pierwszy Sharedowy","999","Wiadomość też sharedowa");
                 patternList=new ArrayList<EmergencyObject>();
@@ -102,6 +102,9 @@ public class EmergencyViewFragment extends Fragment {
         if (tvNumber.getText().equals("")){
             Toast.makeText(getActivity(),"Please, select emergency pattern that contains emergency number",Toast.LENGTH_LONG).show();
         }
+
+        sendMessageAndNumberToService();
+
         bChangePattern.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,6 +113,13 @@ public class EmergencyViewFragment extends Fragment {
             }
         });
         return fragmentLayout;
+    }
+
+    private void sendMessageAndNumberToService() {
+        Intent intentPassData=new Intent(getActivity().getBaseContext(),BluetoothService.class);
+        intentPassData.putExtra(BluetoothService.USERS_MESSAGE,tvMessage.getText());
+        intentPassData.putExtra(BluetoothService.USERS_NUMBER,tvNumber.getText());
+        getActivity().startService(intentPassData);
     }
 
     private ArrayList<EmergencyObject> getPatternListFromSharedPreferences() {
