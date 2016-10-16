@@ -22,6 +22,9 @@
     <string name="button_change">Change pattern</string>
     <string name="confirmation_message">Do you want to change pattern to selected one?</string>
     <string name="confirmation_title">Are you sure?</string>
+    <string name="GPS_confirmation_title">GPS is disabled on this device.</string>
+    <string name="GPS_confirmation_message">Would you like to enable it?</string>
+
 
     <!-- Emergency List Activity-->
     <string name="title_emergency_list">Available Patterns</string>

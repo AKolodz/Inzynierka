@@ -4,21 +4,25 @@ package kolodziejczyk.olek.inzynierka.emergencyapp;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class EmergencyDetailActivity extends AppCompatActivity {
 
     BluetoothService bluetoothService;
+
 
     public static final String NEW_OBJECT_EXTRA = "New Emergency Object";
     public static final String SHARED_PREFS_FILENAME = "EmergencyObjectsList";
@@ -48,10 +52,35 @@ public class EmergencyDetailActivity extends AppCompatActivity {
         }else if(id==R.id.bluetooth){
             if(bluetoothService.checkGPState()) {
                 bluetoothService.runGPS();
+            }else{
+                Toast.makeText(getApplicationContext(),"GPS is not activated",Toast.LENGTH_SHORT).show();
+                createTurningOnGpsWindow();
             }
             return  true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void createTurningOnGpsWindow() {
+        //TODO:
+        Log.i(BluetoothService.TAG,"GPS Window");
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle(R.string.GPS_confirmation_title);
+        builder.setMessage(R.string.GPS_confirmation_message);
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        AlertDialog confirmDialogObject = builder.create();
+        confirmDialogObject.show();
     }
 
     private void createAndAddFragment(){

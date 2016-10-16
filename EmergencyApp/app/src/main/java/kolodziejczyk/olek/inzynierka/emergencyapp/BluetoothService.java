@@ -35,7 +35,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
     private final IBinder myBinder=new MyBinder();
     private BluetoothAdapter bluetoothAdapter=null;
     private static String macAddress=null;
-    private BluetoothDevice deviceToConnectWith=null;
+    private BluetoothDevice deviceToConnectWith;
     private ConnectThread connectThread=null;
     private ConnectedThread connectedThread=null;
     private SharedPreferences sharedPreferencesMacAddress;
@@ -74,10 +74,11 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
                 case UNSUCCESS_CONNECT:
                     Log.i(TAG,"Handler: Connection Failed");
-                    Toast.makeText(getApplicationContext(),"Device/MAC address invalid",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Device/MAC address invalid: "+macAddress,Toast.LENGTH_SHORT).show();
                     Intent intent=new Intent(getApplicationContext(),BluetoothListActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    stopSelf();
                     break;
 
                 case MESSAGE_READ:
@@ -120,8 +121,10 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        deviceToConnectWith=null; //have to be here to work correctly after changing working mode from "with external device" to "without"
         bluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
         macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS);
+
 
         if(macAddress==null){
             sharedPreferencesMacAddress=getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
@@ -147,7 +150,6 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
                     connectThread=new ConnectThread(deviceToConnectWith);
                     connectThread.start();
                 }
-
 
                 if(checkPlayServices()){
                     buildGoogleApiClient();
@@ -238,18 +240,6 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
         }
         };
         mHandler.postDelayed(run,5000);
-
-
-        /*try {
-            Log.i(TAG,"Now we go sleep...");
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Log.i(TAG,"And wake up!");
-        stopLocationUpdate();
-        getLocation();*/
     }
 
     private void getLocation() {
