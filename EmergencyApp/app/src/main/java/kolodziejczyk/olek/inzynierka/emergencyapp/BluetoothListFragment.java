@@ -44,12 +44,14 @@ public class BluetoothListFragment extends Fragment {
     private static final int SUCCESS_CONNECT = 0;
     public static final String WHAT_TO_DO="kolodziejczyk.olek.inzynierka.emergencyapp.whattodo";
     public static final String SHARED_PREFS_MAC_ADDRESS="kolodziejczyk.olek.inzynierka.emergencyapp.SharedPrefsMac";
+    public static final String SHARED_PREFS_DEV_NAME="kolodziejczyk.olek.inzynierka.emergencyapp.SharedPrefsName";
     private static final String TAG = "kolodziejczyk.olek";
 
     private BluetoothAdapter bluetoothAdapter=null;
     private boolean isConnected=false;
     private static String macAddress=null;
     private static String deviceName=null;
+
 
     private SharedPreferences sharedPreferencesMacAddress;
     private SharedPreferences.Editor macAddressEditor;
@@ -69,7 +71,7 @@ public class BluetoothListFragment extends Fragment {
     TextView tvDeviceName;
     @InjectView(R.id.text_view_device_information_mac)
     TextView tvDeviceMac;
-    @InjectView(R.id.text_view_bt_off_usage)
+    @InjectView(R.id.button_bt_off_usage)
     TextView tvBtOff;
 
     public BluetoothListFragment() {
@@ -82,23 +84,31 @@ public class BluetoothListFragment extends Fragment {
         View fragmentLayout=inflater.inflate(R.layout.fragment_bluetooth_list,container,false);
         ButterKnife.inject(this,fragmentLayout);
 
-        sharedPreferencesMacAddress=getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
-        macAddress=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_MAC_ADDRESS,"null");
-        tvDeviceMac.setText(macAddress);
+        clickable();
+
+        loadLastMacAddress();
 
         bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
         checkBtState();
 
+        return fragmentLayout;
+    }
+
+    private void loadLastMacAddress() {
+        sharedPreferencesMacAddress=getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
+        macAddress=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_MAC_ADDRESS,"null");
+        deviceName=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_DEV_NAME,"no-name");
+        tvDeviceMac.setText(macAddress);
+        tvDeviceName.setText(deviceName);
+    }
+
+    private void clickable() {
         bConnectToPairedDevices.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isConnected){
-                    //connectThread.cancel();
-                }else{
-                    Intent intentList=new Intent(getActivity().getBaseContext(),BtDeviceList.class);
-                    intentList.putExtra(BluetoothListFragment.WHAT_TO_DO,BtAction.GET_PAIRED);
-                    startActivityForResult(intentList,REQUEST_CONNECTION);
-                }
+                Intent intentList=new Intent(getActivity().getBaseContext(),BtDeviceList.class);
+                intentList.putExtra(BluetoothListFragment.WHAT_TO_DO,BtAction.GET_PAIRED);
+                startActivityForResult(intentList,REQUEST_CONNECTION);
             }
         });
 
@@ -140,13 +150,11 @@ public class BluetoothListFragment extends Fragment {
                 getActivity().finish();
             }
         });
-        return fragmentLayout;
     }
 
     private void checkBtState() {
         if(bluetoothAdapter==null){
             Toast.makeText(getActivity().getBaseContext(),R.string.lack_of_BTmodule,Toast.LENGTH_LONG).show();
-            getActivity().finish();
         }else{
             if(!bluetoothAdapter.isEnabled()){
                 turnOnBluetooth();
@@ -161,7 +169,7 @@ public class BluetoothListFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data); //should I comment this line?
+        //super.onActivityResult(requestCode, resultCode, data); //
         switch(requestCode){
             case REQUEST_ENABLE_BT:
                 if(resultCode== Activity.RESULT_OK){

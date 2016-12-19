@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
+
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class EmergencyViewFragment extends Fragment {
             if(patternList==null || patternList.size()==0){
                 //gdy nie istnieje lub jest pusta: dodaj domyślny. Drugi warunek zabezpiecza przed ewentualnym wyczyszczeniem w jakiś sposób listy schematów
                 Toast.makeText(getActivity().getBaseContext(),"PUSTA LISTA",Toast.LENGTH_LONG).show();
-                EmergencyObject newFirstObject=new EmergencyObject("Pierwszy Sharedowy","999","Wiadomość też sharedowa");
+                EmergencyObject newFirstObject=new EmergencyObject("Custom Pattern","112","I need help");
                 patternList=new ArrayList<EmergencyObject>();
                 patternList.add(newFirstObject);
 
@@ -110,6 +111,7 @@ public class EmergencyViewFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent=new Intent(getContext(),EmergencyListActivity.class);
                 startActivity(intent);
+                getActivity().finish();
             }
         });
         return fragmentLayout;

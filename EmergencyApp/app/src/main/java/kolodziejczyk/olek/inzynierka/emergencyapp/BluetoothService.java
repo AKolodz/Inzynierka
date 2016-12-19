@@ -59,6 +59,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     public static final String TAG = "kolodziejczyk.olek";
+    public static final String TAG_BUFFER = "buffer";
     public static final String SHARED_PREFS_MAC_ADDRESS="kolodziejczyk.olek.inzynierka.emergencyapp.SharedPrefsMac";
 
     private static final int SUCCESS_CONNECT = 0;
@@ -90,6 +91,8 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
                 case MESSAGE_READ:
                     Log.i(TAG,"Handler: MESSAGE");
+
+                    Log.i(TAG_BUFFER, "HANDLER: "+ msg.obj);
 
                     byte[] readBuff=(byte[]) msg.obj;
                     String receivedMsg=new String(readBuff);
@@ -387,14 +390,22 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
             // Keep listening to the InputStream until an exception occurs
             while (true) {
+                Log.i(TAG_BUFFER, "WHILE");
+
                 try {
                     // Read from the InputStream
+                    //The number of bytes actually read is returned as an integer. This method blocks until input data is available, end of file is detected, or an exception is thrown.
                     bytes = mmInStream.read(buffer);
-                    if(true){
-                        // Send the obtained bytes to the UI activity
+                    Log.i(TAG_BUFFER, "RUN bytes: "+String.valueOf(bytes));
+                    Log.i(TAG_BUFFER, "RUN buffer: "+String.valueOf(buffer));
+                    // Send the obtained bytes to the UI activity
+                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                            .sendToTarget();
+                    /*if(true){
+
                         mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget();
-                    }
+                    }*/
                 } catch (IOException e) {
                     break;
                 }

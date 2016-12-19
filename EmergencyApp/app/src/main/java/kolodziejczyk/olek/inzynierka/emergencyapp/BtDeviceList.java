@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -22,7 +23,10 @@ public class BtDeviceList extends ListActivity{
 
     public static final String MAC_ADDRESS = "kolodziejczyk.olek.inzynierka.emergencyapp.MAC";
     public static final String DEVICE_NAME = "kolodziejczyk.olek.inzynierka.emergencyapp.NAME";
+    private static final String RECIEVER_TAG = "reciever_tag";
 
+    private String macAddress=null;
+    private String deviceName=null;
 
     private ArrayAdapter<String> arrayAdapter=null;
     private BluetoothAdapter bluetoothAdapter=null;
@@ -89,19 +93,27 @@ public class BtDeviceList extends ListActivity{
 
         bluetoothAdapter.cancelDiscovery();
         String generalInfo=((TextView)view).getText().toString();
-        String macAddress=generalInfo.substring(generalInfo.length()-17);
-        String deviceName=generalInfo.substring(0,generalInfo.length()-17);
+        macAddress=generalInfo.substring(generalInfo.length()-17); //podział na podciągi
+        deviceName=generalInfo.substring(0,generalInfo.length()-17);
 
+        returnInfo();
+        finish();
+    }
+
+    private void returnInfo() {
         Intent intentMacReturn=new Intent();
         intentMacReturn.putExtra(MAC_ADDRESS,macAddress);
         intentMacReturn.putExtra(DEVICE_NAME,deviceName);
         setResult(RESULT_OK,intentMacReturn);
-        finish();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //unregisterReceiver(mReceiver);
+        Log.i(RECIEVER_TAG,"onDestroy");
+        if(mReceiver!=null){
+            unregisterReceiver(mReceiver);
+            Log.i(RECIEVER_TAG,"mReciever destroyed");
+        }
     }
 }

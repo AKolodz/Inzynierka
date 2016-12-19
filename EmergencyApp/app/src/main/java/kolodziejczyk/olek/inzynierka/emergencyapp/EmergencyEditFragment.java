@@ -23,7 +23,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */

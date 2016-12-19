@@ -29,7 +29,11 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         ButterKnife.inject(this);
 
+        clickable();
 
+    }
+
+    private void clickable() {
         bEmergency.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
