@@ -96,11 +96,11 @@ public class BtDeviceList extends ListActivity{
         macAddress=generalInfo.substring(generalInfo.length()-17); //podział na podciągi
         deviceName=generalInfo.substring(0,generalInfo.length()-17);
 
-        returnInfo();
+        returnInfoToActivity();
         finish();
     }
 
-    private void returnInfo() {
+    private void returnInfoToActivity() {
         Intent intentMacReturn=new Intent();
         intentMacReturn.putExtra(MAC_ADDRESS,macAddress);
         intentMacReturn.putExtra(DEVICE_NAME,deviceName);

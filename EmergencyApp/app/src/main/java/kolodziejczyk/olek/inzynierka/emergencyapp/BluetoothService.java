@@ -119,42 +119,34 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
         super.onCreate();
     }
 
-    protected boolean checkGPState() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            Log.i(TAG,"GPS OFF");
-            return false;
-        }else{
-            Log.i(TAG,"GPS ON");
-            return true;
-        }
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG,"OnStartCommand SERVICE");
-        deviceToConnectWith=null; //have to be here to work correctly after changing working mode from "with external device" to "without"
+
+        deviceToConnectWith=null; //has to be here to work correctly after changing working mode from "with external device" to "without"
         bluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
-        macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS);
+
+        macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS); //get MAC Address send from BluetoothListFragment
         emergencyNumber=intent.getExtras().getString(BluetoothService.USERS_NUMBER);
         emergencyMessage = intent.getExtras().getString(BluetoothService.USERS_MESSAGE);
+
         Log.i(TAG,"SERVICE Mac: "+macAddress);
         Log.i(TAG,"SERVICE Message: "+emergencyMessage);
         Log.i(TAG,"SERVICE Number: "+emergencyNumber);
 
-        if(macAddress==null){
-            sharedPreferencesMacAddress=getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
-            macAddress=sharedPreferencesMacAddress.getString(BluetoothService.SHARED_PREFS_MAC_ADDRESS,null);
+        if(macAddress==null){                   //jeśli nic nie zostało przesłane z BluetoothListFragment
+            loadMacFromSharedPrefs();
             Log.i(TAG,"onStartCommand "+macAddress);
-            if(macAddress==null){
-                Log.i(TAG,"Saved macAddress is incorrect"+macAddress); //go to BluetoothListActivity and select another device
+
+            if(macAddress==null){               //jeśli nadal (po próbie wczytania z pliku) nie dysponujemy żadnym poprawnym Adresem MAC
+                Log.i(TAG,"Saved macAddress is incorrect"+macAddress);
                 Intent intentGetMac=new Intent(BluetoothService.this,BluetoothListActivity.class);
-                startActivity(intentGetMac);
-                stopSelf();
+                startActivity(intentGetMac);    //idź do BluetoothListActivity (Fragment) i wybierz ponownie urządzenie
+                stopSelf();                     //zatrzymanie usługi
             }
-        }else if(!macAddress.equals("null")){
+        }else if(!macAddress.equals("null")){   //jeśli chcemy pracować z urządzeniem zewnętrznym (wybrano opcję Confirm)
             Log.i(TAG,"macAddress not 'null' ");
-            deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);
+            deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);   //stwórz obraz urządzenia Bluetooth w oparciu o jego adres MAC
             bluetoothAdapter.cancelDiscovery();
         }
 
@@ -162,8 +154,8 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
             @Override
             public void run() {
                 Log.i(TAG,"New Thread");
-                if(deviceToConnectWith!=null){
-                    connectThread=new ConnectThread(deviceToConnectWith);
+                if(deviceToConnectWith!=null){  //jeśli dysponujemy obrazem urządzenia, z którym możemy się połączyć
+                    connectThread=new ConnectThread(deviceToConnectWith); //spróbuj nawiązać połączenie ze wskazanym urządzeniem
                     connectThread.start();
                 }
 
@@ -182,6 +174,11 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
         thread.start();
 
         return Service.START_STICKY;
+    }
+
+    private void loadMacFromSharedPrefs() {
+        sharedPreferencesMacAddress=getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
+        macAddress=sharedPreferencesMacAddress.getString(BluetoothService.SHARED_PREFS_MAC_ADDRESS,null);
     }
 
     @Override
@@ -280,6 +277,17 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
         }
     }
 
+    protected boolean checkGPState() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            Log.i(TAG,"GPS OFF");
+            return false;
+        }else{
+            Log.i(TAG,"GPS ON");
+            return true;
+        }
+    }
+
     protected void showLocation() {
         Toast.makeText(getApplicationContext(),latitude +"\t"+longitude,Toast.LENGTH_SHORT).show();
     }
@@ -345,14 +353,10 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
             manageConnectedSocket(mmSocket);
         }
 
-
-
         /** Will cancel an in-progress connection, and close the socket */
         public void cancel() {
             try {
                 Toast.makeText(getBaseContext(),"Device disconnected",Toast.LENGTH_SHORT).show();
-                //isConnected=false;
-                //bConnectToPairedDevices.setText("Connect to paired device");
                 mmSocket.close();
             } catch (IOException e) { }
         }
