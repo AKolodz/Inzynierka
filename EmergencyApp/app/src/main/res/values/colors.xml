@@ -5,6 +5,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="Black">#000000</color>
     <color name="Grey">#6d6d6d</color>
-    <color name="Custom1">#FFFFDCA8</color>
+    <color name="Custom1">#ffdca8</color>
     <color name="Custom2">#ffcc81</color>
+    <color name = "Custom3">#81ffb8</color>
+    <color name = "Custom4">#81ff81</color>
 </resources>

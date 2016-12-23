@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="kolodziejczyk.olek.inzynierka.emergencyapp.EmergencyEditFragment"
-    android:background="@color/Custom1">
+    android:background="@color/Custom3">
 
     <ScrollView
         android:layout_width="wrap_content"
@@ -14,7 +14,7 @@
         android:layout_alignParentEnd="true"
         android:padding="2dp"
         android:layout_marginBottom="5dp"
-        android:background="@color/Custom2">
+        android:background="@color/Custom4">
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/scroll_view_edit1"
         android:hint="Enter phone number"
-        android:background="@color/Custom2"
+        android:background="@color/Custom4"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:paddingStart="10dp"
         android:paddingBottom="2dp"
@@ -42,7 +42,7 @@
         android:id="@+id/scroll_view_edit2"
         android:layout_alignParentEnd="true"
         android:padding="10dp"
-        android:background="@color/Custom2"
+        android:background="@color/Custom4"
         android:layout_above="@+id/button_save">
         <EditText
             android:layout_width="wrap_content"
