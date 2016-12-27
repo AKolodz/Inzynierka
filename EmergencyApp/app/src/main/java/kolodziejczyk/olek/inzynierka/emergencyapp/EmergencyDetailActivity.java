@@ -1,18 +1,17 @@
 package kolodziejczyk.olek.inzynierka.emergencyapp;
 
 
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,15 +27,31 @@ public class EmergencyDetailActivity extends AppCompatActivity {
     public static final String SHARED_PREFS_FILENAME = "EmergencyObjectsList";
     public static final String FULL_LIST="SharedList";
 
+    private boolean mBound=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_detail);
         createAndAddFragment();
-
-        Intent i=new Intent(this,BluetoothService.class);
-        bindService(i,myConnection, Context.BIND_AUTO_CREATE);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent i=new Intent(this,BluetoothService.class);
+        bindService(i,myConnection, Context.BIND_AUTO_CREATE); //bind here because we want be bound only when activity is visible
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mBound) {
+            unbindService(myConnection);
+            mBound = false;
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -118,11 +133,12 @@ public class EmergencyDetailActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             BluetoothService.MyBinder myBinder=(BluetoothService.MyBinder) iBinder;
             bluetoothService=myBinder.getService();
+            mBound=true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-
+            mBound=false;
         }
     };
 

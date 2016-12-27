@@ -100,6 +100,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
                             updateLocationAndSendMessage();
                         }else{
                             Log.i(TAG,"MESSAGE: GPS OFF");
+                            sendMessageWithoutUpdatedLocation();
                             //TODO: Put last known location and inform about that in message;
                         }
                     }
@@ -158,6 +159,16 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
         return Service.START_STICKY;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG,"onDestroy()");
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+        stopSelf();
+    }
+
     private void getMacAndExtrasFromViewFragment(Intent intent) {
         macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS); //get MAC Address send from BluetoothListFragment
         emergencyNumber=intent.getExtras().getString(BluetoothService.USERS_NUMBER);
@@ -185,15 +196,6 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
     private void loadMacFromSharedPrefs() {
         sharedPreferencesMacAddress=getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
         macAddress=sharedPreferencesMacAddress.getString(BluetoothService.SHARED_PREFS_MAC_ADDRESS,null);
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.i(TAG,"onDestroy()");
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
-        super.onDestroy();
     }
 
     protected void createLocationRequest() {
@@ -245,6 +247,11 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     }
 
+    private void sendMessageWithoutUpdatedLocation() {
+        getLocation();
+        sendSMS();
+    }
+
     protected void updateLocationAndSendMessage() {
         longitude=0;
         latitude=0;
@@ -265,8 +272,14 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     protected void sendSMS() {
         SmsManager smsManager=SmsManager.getDefault();
-        smsManager.sendTextMessage(emergencyNumber,null,"My Location:\nLATITUDE: "+latitude+"\nLONGITUDE: "+longitude,null,null);
         smsManager.sendTextMessage(emergencyNumber,null,emergencyMessage,null,null);
+
+        if(checkGPState()){
+            smsManager.sendTextMessage(emergencyNumber,null,"My present location:\nLATITUDE: "+latitude+"\nLONGITUDE: "+longitude,null,null);
+        }else{
+            smsManager.sendTextMessage(emergencyNumber,null,"My last known location:\nLATITUDE: "+latitude+"\nLONGITUDE: "+longitude,null,null);
+        }
+
         //podzielone ze względu na pojawiający się błąd Android  java.lang.SecurityException: Requires READ_PHONE_STATE: Neither user 10042 nor current process has android.permission.READ_PHONE_STATE.
         Log.i(TAG,"Sms");
 }
