@@ -1,10 +1,12 @@
 package kolodziejczyk.olek.inzynierka.emergencyapp;
 
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -17,11 +19,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+
 
 public class EmergencyDetailActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CHECK_SETTINGS = 1000;
     BluetoothService bluetoothService;
-
+    private PendingResult<LocationSettingsResult> result = null;
 
     public static final String NEW_OBJECT_EXTRA = "New Emergency Object";
     public static final String SHARED_PREFS_FILENAME = "EmergencyObjectsList";
@@ -69,32 +78,27 @@ public class EmergencyDetailActivity extends AppCompatActivity {
                 bluetoothService.updateLocationAndSendMessage();
             }else{
                 Toast.makeText(getApplicationContext(),"GPS is not activated",Toast.LENGTH_SHORT).show();
-                createTurningOnGpsWindow();
+                showDialogWindow(this);
             }
             return  true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void createTurningOnGpsWindow() {
-        Log.i(BluetoothService.TAG,"GPS Window");
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        builder.setTitle(R.string.GPS_confirmation_title);
-        builder.setMessage(R.string.GPS_confirmation_message);
-        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+    protected void showDialogWindow(final Activity activity){
+        result=bluetoothService.getSettingsResult(); //przejmij obiekt zawierający informacje na temat ustawień Location API
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();   //jaki jest stan GPS?
+                try {
+                    Log.i(BluetoothService.TAG,"GPS Dialog");
+                    status.startResolutionForResult(activity,REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.cancel();
-            }
-        });
-        AlertDialog confirmDialogObject = builder.create();
-        confirmDialogObject.show();
     }
 
     private void createAndAddFragment(){
@@ -142,4 +146,23 @@ public class EmergencyDetailActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // All required changes were successfully made
+                        bluetoothService.updateLocationAndSendMessage();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // The user was asked to change settings, but chose not to
+                        bluetoothService.sendMessageWithoutUpdatedLocation();
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        }
+    }
 }

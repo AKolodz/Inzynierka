@@ -1,10 +1,12 @@
 package kolodziejczyk.olek.inzynierka.emergencyapp;
 
+import android.app.Activity;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
@@ -20,9 +22,14 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,9 +52,11 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
     private SharedPreferences sharedPreferencesMacAddress;
     private SharedPreferences.Editor macAddressEditor;
 
+    private static final int REQUEST_CHECK_SETTINGS = 1000;
     private GoogleApiClient mGoogleApiClient = null;
     private LocationRequest mLocationRequest=null;
     private Location mLastLocation=null;
+    private PendingResult<LocationSettingsResult> result = null;
     private static int UPDATE_INTERVAL=10000;
     private static int FASTEST_INTERVAL=5000;
     private static int DISPLACEMENT=10;
@@ -101,7 +110,6 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
                         }else{
                             Log.i(TAG,"MESSAGE: GPS OFF");
                             sendMessageWithoutUpdatedLocation();
-                            //TODO: Put last known location and inform about that in message;
                         }
                     }
                     break;
@@ -158,6 +166,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
         return Service.START_STICKY;
     }
+
 
     @Override
     public void onDestroy() {
@@ -247,10 +256,19 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     }
 
-    private void sendMessageWithoutUpdatedLocation() {
+    protected void sendMessageWithoutUpdatedLocation() {
         getLocation();
         sendSMS();
     }
+
+    protected PendingResult<LocationSettingsResult> getSettingsResult(){
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        builder.setAlwaysShow(true);
+        result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+        return result;
+    }
+
 
     protected void updateLocationAndSendMessage() {
         longitude=0;
