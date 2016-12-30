@@ -348,6 +348,8 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
         }
     }
 
+                                                /* KLASY LOKALNE*/
+
     private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
@@ -381,7 +383,6 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
                     Log.i(TAG,"ConnectThread(run) Connection Failure");
                     mHandler.obtainMessage(UNSUCCESS_CONNECT).sendToTarget();
                     mmSocket.close();
-                    //isConnected=false;
                 } catch (IOException closeException) { }
                 return;
             }

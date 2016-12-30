@@ -66,7 +66,7 @@ public class EmergencyViewFragment extends Fragment {
         Intent intent=getActivity().getIntent();
         firstRun=intent.getExtras().getBoolean(HomeScreen.FIRST_RUN_EXTRA,false);
 
-        //CHECKS IF IT IS FIRST RUN - IF IT'S SO THEN WE SHOULD LOAD LAST OBJECT FROM SHAREDPREFERENCES
+        //CHECKS IF IT IS FIRST RUN - IF IT'S THEN WE SHOULD LOAD LAST OBJECT FROM SHAREDPREFERENCES
         if(firstRun){
             Toast.makeText(getActivity().getApplicationContext(),"FIRST RUN!",Toast.LENGTH_SHORT).show();
             //GET FULL LIST OF SAVED PATTERNS

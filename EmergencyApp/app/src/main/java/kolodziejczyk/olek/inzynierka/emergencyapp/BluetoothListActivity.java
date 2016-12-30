@@ -24,7 +24,5 @@ public class BluetoothListActivity extends AppCompatActivity {
         fragmentTransaction.add(R.id.bluetooth_dev_list_container,bluetoothListFragment);
         fragmentTransaction.commit();
     }
-
-
 }
 

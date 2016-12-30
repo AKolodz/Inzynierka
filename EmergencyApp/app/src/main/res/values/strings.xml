@@ -39,7 +39,7 @@
     <string name="confirmation_message1">Do you really want to save this Pattern?</string>
 
     <!-- Bluetooth List Activity-->
-    <string name="title_bluetooth">BLUETOOTH</string>
+    <string name="title_bluetooth">ACTION</string>
     <string name="text_view_paired_description">Click if you want to see list of paired devices: </string>
     <string name="button_connect_paired">Connect to paired</string>
     <string name="device_information_title">"Your phone will be connected to:</string>
