@@ -68,6 +68,8 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
 
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     public static final String TAG = "kolodziejczyk.olek";
+    //private final String defaultMac="20:15:12:29:63:33";
+    private final String noSavedMac="lackOfMac";
     public static final String TAG_BUFFER = "buffer";
     public static final String SHARED_PREFS_MAC_ADDRESS="kolodziejczyk.olek.inzynierka.emergencyapp.SharedPrefsMac";
 
@@ -145,7 +147,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
             @Override
             public void run() {
                 Log.i(TAG,"New Thread");
-                if(deviceToConnectWith!=null){  //jeśli dysponujemy obrazem urządzenia, z którym możemy się połączyć
+                if(deviceToConnectWith!=null){  //jeśli dysponujemy reprezentacją urządzenia, z którym możemy się połączyć
                     connectThread=new ConnectThread(deviceToConnectWith); //spróbuj nawiązać połączenie ze wskazanym urządzeniem
                     connectThread.start();
                 }
@@ -175,6 +177,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        connectedThread.cancel();
         stopSelf();
     }
 
@@ -189,16 +192,19 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
             loadMacFromSharedPrefs();
             Log.i(TAG,"onStartCommand "+macAddress);
 
-            if(macAddress==null){               //jeśli nadal (po próbie wczytania z pliku) nie dysponujemy żadnym poprawnym Adresem MAC
-                Log.i(TAG,"Saved macAddress is incorrect"+macAddress);
-                Intent intentGetMac=new Intent(BluetoothService.this,BluetoothListActivity.class);
-                startActivity(intentGetMac);    //idź do BluetoothListActivity (Fragment) i wybierz ponownie urządzenie
-                stopSelf();                     //zatrzymanie usługi
+            if(macAddress.equals(null)){               //jeśli nadal (po próbie wczytania z pliku) nie dysponujemy żadnym poprawnym Adresem MAC
+                Log.i(TAG,"Saved macAddress is incorrect "+macAddress);
+                mHandler.obtainMessage(UNSUCCESS_CONNECT).sendToTarget();
+                //Intent intentGetMac=new Intent(BluetoothService.this,BluetoothListActivity.class);
+                //startActivity(intentGetMac);    //idź do BluetoothListActivity (Fragment) i wybierz ponownie urządzenie
+                //stopSelf();                     //zatrzymanie usługi
             }
-        }else if(!macAddress.equals("null")){   //jeśli chcemy pracować z urządzeniem zewnętrznym (wybrano opcję Confirm)
-            Log.i(TAG,"macAddress not 'null' ");
+        }else if(!macAddress.equals("empty")){   //jeśli chcemy pracować z urządzeniem zewnętrznym (wybrano opcję Confirm)
+            Log.i(TAG,"macAddress not 'empty' ");
             deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);   //stwórz obraz urządzenia Bluetooth w oparciu o jego adres MAC
             bluetoothAdapter.cancelDiscovery();
+        }else if(macAddress.equals("nul")){
+            Log.i(TAG,"nul dfhjdfhjfgj");
         }
     }
 

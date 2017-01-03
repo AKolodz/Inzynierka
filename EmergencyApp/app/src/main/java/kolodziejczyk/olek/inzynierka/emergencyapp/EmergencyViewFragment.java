@@ -42,6 +42,7 @@ public class EmergencyViewFragment extends Fragment {
     Button bChangePattern;
 
     private boolean firstRun=false;
+    String macAddress=null;
 
     private ArrayList<EmergencyObject> patternList;
 
@@ -65,7 +66,7 @@ public class EmergencyViewFragment extends Fragment {
         //GET EXTRAS FROM PREVIOUS ACTIVITY
         Intent intent=getActivity().getIntent();
         firstRun=intent.getExtras().getBoolean(HomeScreen.FIRST_RUN_EXTRA,false);
-
+        macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS);
         //CHECKS IF IT IS FIRST RUN - IF IT'S THEN WE SHOULD LOAD LAST OBJECT FROM SHAREDPREFERENCES
         if(firstRun){
             Toast.makeText(getActivity().getApplicationContext(),"FIRST RUN!",Toast.LENGTH_SHORT).show();
@@ -110,6 +111,7 @@ public class EmergencyViewFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(getContext(),EmergencyListActivity.class);
+                intent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
                 startActivity(intent);
                 getActivity().finish();
             }
@@ -121,6 +123,7 @@ public class EmergencyViewFragment extends Fragment {
         Intent intentPassData=new Intent(getActivity().getBaseContext(),BluetoothService.class);
         intentPassData.putExtra(BluetoothService.USERS_MESSAGE,tvMessage.getText());
         intentPassData.putExtra(BluetoothService.USERS_NUMBER,tvNumber.getText());
+        intentPassData.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
         getActivity().startService(intentPassData);
     }
 

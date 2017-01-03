@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -85,7 +86,7 @@ public class EmergencyListFragment extends ListFragment {
         intent.putExtra(EmergencyListActivity.EMERGENCY_TITLE_EXTRA,emergencyObject.getTitle());
         intent.putExtra(EmergencyListActivity.EMERGENCY_NUMBER_EXTRA,emergencyObject.getPhoneNumber());
         intent.putExtra(EmergencyListActivity.EMERGENCY_MESSAGE_EXTRA,emergencyObject.getMessage());
-        intent.putExtra(EmergencyListActivity.EMERGENCY_ID_EXTRA,emergencyObject.getObjectId());
+        intent.putExtra(BtDeviceList.MAC_ADDRESS,"empty");
         intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,false);
 
         switch(fragmentToLaunch){

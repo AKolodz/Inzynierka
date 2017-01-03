@@ -96,7 +96,7 @@ public class BluetoothListFragment extends Fragment {
 
     private void loadLastMacAddress() {
         sharedPreferencesMacAddress=getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
-        macAddress=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_MAC_ADDRESS,"null");
+        macAddress=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_MAC_ADDRESS,"nul");
         deviceName=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_DEV_NAME,"no-name");
         tvDeviceMac.setText(macAddress);
         tvDeviceName.setText(deviceName);
@@ -126,11 +126,11 @@ public class BluetoothListFragment extends Fragment {
             public void onClick(View view) {
                 Intent serviceIntent=new Intent(getActivity().getApplicationContext(), BluetoothService.class);
                 serviceIntent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
-                getActivity().startService(serviceIntent);
 
                 Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyDetailActivity.class);
                 intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.VIEW);
                 intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,true);
+                intent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
                 startActivity(intent);
                 getActivity().finish();
             }
@@ -139,13 +139,13 @@ public class BluetoothListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent serviceIntent=new Intent(getActivity().getApplicationContext(), BluetoothService.class);
-                macAddress="null";
+                macAddress="empty";
                 serviceIntent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
-                getActivity().startService(serviceIntent);
 
                 Intent intent = new Intent(getActivity().getApplicationContext(),EmergencyDetailActivity.class);
                 intent.putExtra(EmergencyListActivity.FRAGMENT_TO_LOAD_EXTRA, MainActivity.FragmentToLaunch.VIEW);
                 intent.putExtra(HomeScreen.FIRST_RUN_EXTRA,true);
+                intent.putExtra(BtDeviceList.MAC_ADDRESS,macAddress);
                 startActivity(intent);
                 getActivity().finish();
             }
