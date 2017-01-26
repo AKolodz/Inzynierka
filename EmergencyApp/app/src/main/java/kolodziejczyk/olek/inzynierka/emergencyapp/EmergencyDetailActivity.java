@@ -86,11 +86,11 @@ public class EmergencyDetailActivity extends AppCompatActivity {
     }
 
     protected void showDialogWindow(final Activity activity){
-        result=bluetoothService.getSettingsResult(); //przejmij obiekt zawierający informacje na temat ustawień Location API
+        result=bluetoothService.getSettingsResult(); //catch the object that contains info about Location API settings
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
             public void onResult(LocationSettingsResult result) {
-                final Status status = result.getStatus();   //jaki jest stan GPS?
+                final Status status = result.getStatus();   //what is GPS state
                 try {
                     Log.i(BluetoothService.TAG,"GPS Dialog");
                     status.startResolutionForResult(activity,REQUEST_CHECK_SETTINGS);

@@ -96,7 +96,7 @@ public class BluetoothListFragment extends Fragment {
 
     private void loadLastMacAddress() {
         sharedPreferencesMacAddress=getActivity().getSharedPreferences(EmergencyDetailActivity.SHARED_PREFS_FILENAME,0);
-        macAddress=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_MAC_ADDRESS,"nul");
+        macAddress=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_MAC_ADDRESS,"no-address");
         deviceName=sharedPreferencesMacAddress.getString(BluetoothListFragment.SHARED_PREFS_DEV_NAME,"no-name");
         tvDeviceMac.setText(macAddress);
         tvDeviceName.setText(deviceName);

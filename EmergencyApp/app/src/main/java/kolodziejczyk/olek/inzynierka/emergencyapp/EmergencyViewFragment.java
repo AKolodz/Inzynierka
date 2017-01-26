@@ -69,7 +69,6 @@ public class EmergencyViewFragment extends Fragment {
         macAddress=intent.getExtras().getString(BtDeviceList.MAC_ADDRESS);
         //CHECKS IF IT IS FIRST RUN - IF IT'S THEN WE SHOULD LOAD LAST OBJECT FROM SHAREDPREFERENCES
         if(firstRun){
-            Toast.makeText(getActivity().getApplicationContext(),"FIRST RUN!",Toast.LENGTH_SHORT).show();
             //GET FULL LIST OF SAVED PATTERNS
             patternList=getPatternListFromSharedPreferences();
 

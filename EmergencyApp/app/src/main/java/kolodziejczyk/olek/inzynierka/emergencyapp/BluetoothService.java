@@ -60,7 +60,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
     private static int UPDATE_INTERVAL=10000;
     private static int FASTEST_INTERVAL=5000;
     private static int DISPLACEMENT=10;
-    private static long TIME_FOR_LOCATION_UPDATE=5000;
+    private static long TIME_FOR_LOCATION_UPDATE=30000;
     private double latitude;
     private double longitude;
     private String emergencyNumber;
@@ -147,8 +147,8 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
             @Override
             public void run() {
                 Log.i(TAG,"New Thread");
-                if(deviceToConnectWith!=null){  //jeśli dysponujemy reprezentacją urządzenia, z którym możemy się połączyć
-                    connectThread=new ConnectThread(deviceToConnectWith); //spróbuj nawiązać połączenie ze wskazanym urządzeniem
+                if(deviceToConnectWith!=null){  //if there is representation of device that we can connect with
+                    connectThread=new ConnectThread(deviceToConnectWith); //try to make a connection
                     connectThread.start();
                 }
 
@@ -188,23 +188,20 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
     }
 
     private void checkMacAddressAndGetVirtualBtDevice() {
-        if(macAddress==null){                   //jeśli nic nie zostało przesłane z BluetoothListFragment
+        if(macAddress==null || macAddress.equals("no-address")){    //if nothing was sent from BluetoothListFragment
             loadMacFromSharedPrefs();
             Log.i(TAG,"onStartCommand "+macAddress);
 
-            if(macAddress.equals(null)){               //jeśli nadal (po próbie wczytania z pliku) nie dysponujemy żadnym poprawnym Adresem MAC
+            if(macAddress==null){               //if still (after updating info from saved xml) we do not have correct MAC
                 Log.i(TAG,"Saved macAddress is incorrect "+macAddress);
                 mHandler.obtainMessage(UNSUCCESS_CONNECT).sendToTarget();
-                //Intent intentGetMac=new Intent(BluetoothService.this,BluetoothListActivity.class);
-                //startActivity(intentGetMac);    //idź do BluetoothListActivity (Fragment) i wybierz ponownie urządzenie
-                //stopSelf();                     //zatrzymanie usługi
             }
-        }else if(!macAddress.equals("empty")){   //jeśli chcemy pracować z urządzeniem zewnętrznym (wybrano opcję Confirm)
+        }else if(!macAddress.equals("empty")){   //if Confirm button was the user's choice
             Log.i(TAG,"macAddress not 'empty' ");
-            deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);   //stwórz obraz urządzenia Bluetooth w oparciu o jego adres MAC
+            deviceToConnectWith=bluetoothAdapter.getRemoteDevice(macAddress);   //create representation of BT device based on MAC Address
             bluetoothAdapter.cancelDiscovery();
         }else if(macAddress.equals("nul")){
-            Log.i(TAG,"nul dfhjdfhjfgj");
+            Log.i(TAG,"nul MAC");
         }
     }
 
@@ -354,7 +351,7 @@ public class BluetoothService extends Service implements GoogleApiClient.Connect
         }
     }
 
-                                                /* KLASY LOKALNE*/
+                                                /* LOCAL CLASSES*/
 
     private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
